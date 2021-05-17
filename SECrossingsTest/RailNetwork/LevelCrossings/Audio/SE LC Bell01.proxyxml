@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kLoud-cProxyControlLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+	<ProxyControl>
+		<cGenericAudioControl xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+			<ProxyControlRevision d:type="cDeltaString">eVersion2</ProxyControlRevision>
+			<ActivationDistance d:type="sFloat32">5000.000000</ActivationDistance>
+			<Sound>
+				<kLoud-cSingleSampleSound d:id="63774576">
+					<Name d:type="cDeltaString">Crossing Bell</Name>
+					<IsLooped d:type="bool">1</IsLooped>
+					<Priority d:type="sUInt32">50</Priority>
+					<BaseVolume d:type="sFloat32">0.5000</BaseVolume>
+					<VolumeVariation d:type="sFloat32">0.000000</VolumeVariation>
+					<BasePitchShift d:type="sFloat32">1.000000</BasePitchShift>
+					<PitchShiftVariation d:type="sFloat32">0.000000</PitchShiftVariation>
+					<AttenuationStartDist d:type="sFloat32">15.0000</AttenuationStartDist>
+					<NoFutherAttenuationDist d:type="sFloat32">300.0000</NoFutherAttenuationDist>
+					<InstanceGroup d:type="ref">0</InstanceGroup>
+					<Sample>
+						<kLoud-cSampleID>
+							<Pathname d:type="cDeltaString"></Pathname>
+							<Filename d:type="cDeltaString">newS\sweden\RailNetwork\crossing\audio\se_crossing.wav</Filename>
+						</kLoud-cSampleID>
+					</Sample>
+				</kLoud-cSingleSampleSound>
+				<kLoud-cSingleSampleSound d:id="63803592">
+					<Name d:type="cDeltaString">Crossing Motor</Name>
+					<IsLooped d:type="bool">0</IsLooped>
+					<Priority d:type="sUInt32">100</Priority>
+					<BaseVolume d:type="sFloat32">0.500000</BaseVolume>
+					<VolumeVariation d:type="sFloat32">0.000000</VolumeVariation>
+					<BasePitchShift d:type="sFloat32">1.000000</BasePitchShift>
+					<PitchShiftVariation d:type="sFloat32">0.000000</PitchShiftVariation>
+					<AttenuationStartDist d:type="sFloat32">7220.000000</AttenuationStartDist>
+					<NoFutherAttenuationDist d:type="sFloat32">7225.000000</NoFutherAttenuationDist>
+					<InstanceGroup d:type="ref">0</InstanceGroup>
+					<Sample>
+						<kLoud-cSampleID>
+							<Pathname d:type="cDeltaString">Kuju\RailSimulatorUS</Pathname>
+							<Filename d:type="cDeltaString">Kuju\RailSimulatorUS\Audio\Ambient\US\Point\Amb_P_US_LevelCrossingMotor.dav</Filename>
+						</kLoud-cSampleID>
+					</Sample>
+				</kLoud-cSingleSampleSound>
+			</Sound>
+			<Curve>
+				<kLoud-cCurve d:id="63346960">
+					<Name d:type="cDeltaString">Distance Volume</Name>
+					<CurvePoint>
+						<kLoud-cRVector2 d:id="63345552">
+							<X d:type="sFloat32">0.000000</X>
+							<Y d:type="sFloat32">0.600000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63350416">
+							<X d:type="sFloat32">225.000000</X>
+							<Y d:type="sFloat32">0.375000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63348368">
+							<X d:type="sFloat32">400.000000</X>
+							<Y d:type="sFloat32">0.100000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63349776">
+							<X d:type="sFloat32">1600.000000</X>
+							<Y d:type="sFloat32">0.060000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63661144">
+							<X d:type="sFloat32">3600.000000</X>
+							<Y d:type="sFloat32">0.040000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63811016">
+							<X d:type="sFloat32">6400.000000</X>
+							<Y d:type="sFloat32">0.020000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63810248">
+							<X d:type="sFloat32">10000.000000</X>
+							<Y d:type="sFloat32">0.015000</Y>
+						</kLoud-cRVector2>
+						<kLoud-cRVector2 d:id="63808328">
+							<X d:type="sFloat32">22500.000000</X>
+							<Y d:type="sFloat32">0.000000</Y>
+						</kLoud-cRVector2>
+					</CurvePoint>
+				</kLoud-cCurve>
+			</Curve>
+			<ModifierChain>
+				<kLoud-cModifierChain d:id="63770992">
+					<Name d:type="cDeltaString">Distance Volume</Name>
+					<Modifier>
+						<kLoud-cVolumeCurveModifier d:id="63772016">
+							<ControllerIsGlobal d:type="bool">0</ControllerIsGlobal>
+							<ControllerName d:type="cDeltaString">ListenerDistanceSquared</ControllerName>
+							<Curve d:type="ref">63346960</Curve>
+						</kLoud-cVolumeCurveModifier>
+					</Modifier>
+				</kLoud-cModifierChain>
+			</ModifierChain>
+			<InstanceGroup/>
+			<Loop>
+				<kLoud-cControlledLoop d:id="63656920">
+					<PlayState d:type="cDeltaString">OUTSIDE</PlayState>
+					<Name d:type="cDeltaString"></Name>
+					<Sound d:type="ref">63774576</Sound>
+					<ModifierChain d:type="ref">63770992</ModifierChain>
+					<ControllerName d:type="cDeltaString">CrossingSound</ControllerName>
+					<LoopCondition d:type="cDeltaString">ValueInRange</LoopCondition>
+					<ActiveRangeStartValue d:type="sFloat32">0.500000</ActiveRangeStartValue>
+					<ActiveRangeEndValue d:type="sFloat32">1.000000</ActiveRangeEndValue>
+					<ValueIsChangingGateTime d:type="sFloat32">0.000000</ValueIsChangingGateTime>
+					<InstanceGroup d:type="ref">0</InstanceGroup>
+				</kLoud-cControlledLoop>
+			</Loop>
+			<Oneshot>
+				<kLoud-cTriggeredOneshot d:id="63659096">
+					<PlayState d:type="cDeltaString">OUTSIDE</PlayState>
+					<Name d:type="cDeltaString"></Name>
+					<Sound d:type="ref">63803592</Sound>
+					<ModifierChain d:type="ref">63770992</ModifierChain>
+					<ControllerName d:type="cDeltaString">GateMotor</ControllerName>
+					<TriggerType d:type="cDeltaString">ValueMovesPast</TriggerType>
+					<TriggerValue d:type="sFloat32">0.500000</TriggerValue>
+					<ValueIsChangingGateTime d:type="sFloat32">0.000000</ValueIsChangingGateTime>
+					<InstanceGroup d:type="ref">0</InstanceGroup>
+				</kLoud-cTriggeredOneshot>
+			</Oneshot>
+		</cGenericAudioControl>
+	</ProxyControl>
+</kLoud-cProxyControlLoader>

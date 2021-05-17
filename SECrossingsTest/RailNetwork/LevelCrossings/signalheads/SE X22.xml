@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+	<Blueprint>
+		<cAnimProceduralSceneryBlueprint>
+			<Name d:type="cDeltaString"></Name>
+			<RenderComponent>
+				<cAnimObjectRenderBlueprint>
+					<PrimaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString"></BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</PrimaryNamedTextureSet>
+					<SecondaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString"></BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</SecondaryNamedTextureSet>
+					<GeometryID d:type="cDeltaString">SummerADDE\SECrossingsTest\RailNetwork\LevelCrossings\shapes\[00]sign-kreutz03</GeometryID>
+					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
+					<Pickable d:type="cDeltaString">eTrue</Pickable>
+					<ShadowType d:type="cDeltaString">eShadowType_Blobby</ShadowType>
+					<ViewType d:type="cDeltaString">ExternalView</ViewType>
+					<HeatHaze/>
+					<TexText/>
+					<ProjectedLightElement/>
+					<Instancable d:type="bool">0</Instancable>
+					<DetailLevelGenerationRange>
+						<cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+							<HighestLevel_1isHighest d:type="sInt32">10</HighestLevel_1isHighest>
+							<LowestLevel_10isLowest d:type="sInt32">10</LowestLevel_10isLowest>
+						</cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+					</DetailLevelGenerationRange>
+					<AnimSet>
+						<iAnimObjectRenderBlueprint-cAnimation d:id="57748016">
+							<AnimationID d:type="cDeltaString">Lights</AnimationID>
+							<AnimationName d:type="cDeltaString"></AnimationName>
+							<AnimateInEditor d:type="cDeltaString">eFalse</AnimateInEditor>
+						</iAnimObjectRenderBlueprint-cAnimation>
+					</AnimSet>
+				</cAnimObjectRenderBlueprint>
+			</RenderComponent>
+			<PosOriComponent>
+				<cPosOriBlueprint/>
+			</PosOriComponent>
+		</cAnimProceduralSceneryBlueprint>
+	</Blueprint>
+</cBlueprintLoader>

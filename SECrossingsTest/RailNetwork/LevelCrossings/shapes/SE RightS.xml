@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+	<Blueprint>
+		<cAnimProceduralSceneryBlueprint>
+			<Name d:type="cDeltaString">SE_UQArm_03</Name>
+			<RenderComponent>
+				<cAnimObjectRenderBlueprint>
+					<PrimaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString"></BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</PrimaryNamedTextureSet>
+					<SecondaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString"></BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</SecondaryNamedTextureSet>
+					<GeometryID d:type="cDeltaString">SummerADDE\SECrossingsTest\RailNetwork\LevelCrossings\shapes\[00]se_UQArm_03</GeometryID>
+					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
+					<Pickable d:type="cDeltaString">eTrue</Pickable>
+					<ShadowType d:type="cDeltaString">eShadowType_Blobby</ShadowType>
+					<HeatHaze/>
+					<TexText/>
+					<ProjectedLightElement/>
+					<Instancable d:type="bool">0</Instancable>
+					<DetailLevelGenerationRange>
+						<cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+							<HighestLevel_1isHighest d:type="sInt32">1</HighestLevel_1isHighest>
+							<LowestLevel_10isLowest d:type="sInt32">10</LowestLevel_10isLowest>
+						</cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+					</DetailLevelGenerationRange>
+					<AnimSet>
+						<iAnimObjectRenderBlueprint-cAnimation d:id="16297872">
+							<AnimationID d:type="cDeltaString">Clear01</AnimationID>
+							<AnimationName d:type="cDeltaString">SummerADDE\SECrossingsTest\RailNetwork\LevelCrossings\shapes\se_UQArm_03_clear</AnimationName>
+							<AnimateInEditor d:type="cDeltaString">eFalse</AnimateInEditor>
+						</iAnimObjectRenderBlueprint-cAnimation>
+						<iAnimObjectRenderBlueprint-cAnimation d:id="16677832">
+							<AnimationID d:type="cDeltaString">Stop01</AnimationID>
+							<AnimationName d:type="cDeltaString">SummerADDE\SECrossingsTest\RailNetwork\LevelCrossings\shapes\se_UQArm_03_stop</AnimationName>
+							<AnimateInEditor d:type="cDeltaString">eFalse</AnimateInEditor>
+						</iAnimObjectRenderBlueprint-cAnimation>
+					</AnimSet>
+				</cAnimObjectRenderBlueprint>
+			</RenderComponent>
+			<PosOriComponent>
+				<cPosOriBlueprint/>
+			</PosOriComponent>
+		</cAnimProceduralSceneryBlueprint>
+	</Blueprint>
+</cBlueprintLoader>
