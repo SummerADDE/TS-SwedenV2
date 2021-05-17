@@ -4,6 +4,6 @@ Bygger nya assets och moderniserar befintliga svenska assets till Train Simulato
 Filerna som finns här är baserade på befintliga filer skapade för Train Simulator och följer dessa licenser och TS EULA.
 Credits: newS, KMW, DTG and others...
 
-Notera att endast .xml-filer och .lua filer finns upplagda här. För att ladda ner och testa filerna så ska de placeras i /Railworks/Assets/SummerADDE. 3D-filer ska kopieras från newS och placeras i /shapes-mappen för respektive testmapp. Detsamma gäller för ljudfiler, animationer och texturfiler. Kolla mina xml-filer för att ta reda på vart varje objekt ska placeras. Varför de inte delas med här är av copyright-skäl. Glöm inte att Serz:a filerna så .bin-filer genereras.
+Notera att endast .xml-filer och .lua filer finns upplagda här. För att ladda ner och testa filerna så börja med att ladda ner "Complete downloads" för att få med hela paketet att testa med i Train Simulator. När du har gjort ändringar, så kan du ladda upp eller redigera befintlig .xml-fil här. OBS spara som "Create a new branch for this commit and start a pull request." så vi kan jämföra dina ändringar med orginalet. Inga bin-filer eller geopcdx.
 
 //ADDE
