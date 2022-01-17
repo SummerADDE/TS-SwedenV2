@@ -107,7 +107,14 @@ function DefaultSetLights()
 		SwitchLight( LIGHT_NODE_RED,		0 )
 		SwitchLight( LIGHT_NODE_GREEN2,		1 )
 		SwitchLight( LIGHT_NODE_WHITE, 		0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 	gLightOn )
+		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
+
+	elseif (gSignalState == STATE_SLOWER) then
+		SwitchLight( LIGHT_NODE_GREEN,		1 )
+		SwitchLight( LIGHT_NODE_RED,		0 )
+		SwitchLight( LIGHT_NODE_GREEN2,		1 )
+		SwitchLight( LIGHT_NODE_WHITE, 		0 )
+		SwitchLight( LIGHT_NODE_GREEN3, 	1 )
 
 	else	-- stop or blocked
 		SwitchLight( LIGHT_NODE_GREEN,		0 )
@@ -132,6 +139,7 @@ STATE_GO										= 0
 STATE_SLOW										= 1
 STATE_STOP										= 2
 STATE_BLOCKED									= 3
+STATE_SLOWER									= 4
 STATE_RESET										= 9
 
 -- How long to stay off/on in each flash cycle
@@ -172,7 +180,7 @@ gHomeSignal 	= true
 gDistanceSignal = false
 gBlockSignal	= false				 	-- is this an intermediate block signal?
 gConnectedLink	= 0						-- which link is connected?
-gLightOn			= 0						-- set 3 greens or 2 greens in STATE_SLOW
+gLightOn			= 0					-- set 3 greens or 2 greens in STATE_SLOW
 
 -- State of flashing light
 gLightFlashOn			= 0
@@ -207,10 +215,6 @@ function BaseInitialise()
 		gDissabled[link] = false
 		gOccupationTable[link] = 0
 	end
-	-- Get link character and store it as "gIndicator".
-	gLinkFeatherChar = 0
-	gIndicator = ""
-
 
 	Call("BeginUpdate")
 end
@@ -232,8 +236,6 @@ function InitialiseSignal()
 			gLinkCount = gLinkCount - 1
 		end
 	end
-	
-
 	
 	gBlockSignal = gHomeSignal and (gLinkCount == 1)	
 	
@@ -292,53 +294,6 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 			SetSignalState()			
 		end
 	end
-end
-
---------------------------------------------------------------------------------------
--- DEFAULT ACTIVATE ROUTE INDICATOR
--- Switches route indicators on and off depending on connected link
---
-function DefaultActivateRouteIndicator ( gConnectedLink )
-	
-	local newIndicator = 0
-	local newIndicatorStr = ""
-
-	-- If we're connected to a valid link and the signal isn't red
-	if gConnectedLink > 0 then
-
-		-- Check what indicator (if any) is used by that route
-		newIndicator = Call("GetLinkFeatherChar", gConnectedLink)
-
-		-- If route has a valid indicator, turn its ID into a string
-		if newIndicator ~= 0 then
-			newIndicatorStr = string.char(newIndicator)
-		else
-			newIndicatorStr = ""
-		end
-	end
-	
-	-- If we were connected to a different link before
-	if gCurrentIndicator ~= newIndicatorStr then
-
-		-- If a feather is currently switched on, switch it off
-		if gCurrentIndicator ~= "" then
-			gLightOn = 0
-		end
-			
-		-- If the newly connected route has a feather, switch it on
-		if newIndicatorStr ~= "" then
-			if newIndicatorStr == 3 then
-				gLightOn = 1
-			else
-				gLightOn = 0
-			end
-		end
-		
-		DebugPrint(("DEBUG: DefaultActivateRouteIndicator() - route indicator switching from " .. INDICATOR_ROOT_NAME .. gCurrentIndicator .. " to " .. INDICATOR_ROOT_NAME .. newIndicator))
-	end
-	
-	-- Remember which indicator we just switched on
-	gCurrentIndicator = newIndicatorStr
 end
 
 --------------------------------------------------------------------------------------
@@ -470,6 +425,20 @@ function SetSignalState()
 	elseif gConnectedLink > 0 and gLinkState[gConnectedLink] == STATE_BLOCKED then
 		-- exit signal facing an occupied block
 		newSignalState = STATE_STOP
+		
+		
+	elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
+		if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
+			-- Check if next signal is at red, show a slow signal if that is the case.
+			if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
+				newSignalState = STATE_GO
+			else
+				newSignalState = STATE_SLOWER
+			end
+		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- diverging route, signal slow
+			newSignalState = STATE_SLOWER
+		end
 	elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 		-- Check if next signal is at red, show a slow signal if that is the case.
 		if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
@@ -489,14 +458,23 @@ function SetSignalState()
 		if gSignalState >= STATE_STOP then
 			Call( "Set2DMapSignalState", STATE_STOP)
 		else
-			Call( "Set2DMapSignalState", gSignalState)
+			if gSignalState == STATE_SLOWER then
+				Call( "Set2DMapSignalState", STATE_SLOW)
+			else
+				Call( "Set2DMapSignalState", gSignalState)
+			end
 		end
 		if gSignalState == STATE_BLOCKED and not gBlockSignal then
 			Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
 		else
-			Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			if gSignalState == STATE_SLOWER then
+				Call( "SendSignalMessage", SIGNAL_GO + STATE_SLOW, "", -1, 1, 0 )
+			else
+				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			end
 		end
 	end
+
 end
 
 --------------------------------------------------------------------------------------
@@ -505,7 +483,7 @@ end
 function Update( time )
 --	DebugPrint("Update(" .. time .. ")")
 	if not gInitialised then
-		InitialiseSignal()
+		InitialiseSignal()			
 	else
 		gTimeSinceLastFlash = gTimeSinceLastFlash + time
 		if gTimeSinceLastFlash >= LIGHT_FLASH_SECS then
