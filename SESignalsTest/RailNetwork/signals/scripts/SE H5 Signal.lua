@@ -1,10 +1,17 @@
 --------------------------------------------------------------------------------------
 -- KMW / Anders Eriksson
 -- 090108 First version
+-- 220119 Massively updated version by SummerADDE / Andreas Ulvebring
 --------------------------------------------------------------------------------------
 
 --include=SE CommonScript.lua
 --include=Signal CommonScript.lua
+
+--------------------------------------------------------------------------------------
+-- ASCII code for GetLinkFeatherChar
+-- Code: 49		Token: 1	Usage: Check next signal. If gExpectState = STATE_STOP then newSignalState = STATE_STOP.
+-- Code: 50		Token: 2	Usage: For Shunt signal to show "Pass, Check switches".
+-- Code: 51		Token: 3	Usage: For H5 signals. newSignalState = STATE_SLOWER and not STATE_SLOW.
 
 --------------------------------------------------------------------------------------
 -- INITIALISE
@@ -140,6 +147,7 @@ STATE_SLOW										= 1
 STATE_STOP										= 2
 STATE_BLOCKED									= 3
 STATE_SLOWER									= 4
+STATE_CALL_ON									= 5
 STATE_RESET										= 9
 
 -- How long to stay off/on in each flash cycle
@@ -150,6 +158,7 @@ RESET_SIGNAL_STATE							= 0
 INITIALISE_SIGNAL_TO_BLOCKED 				= 1
 JUNCTION_STATE_CHANGE						= 2
 INITIALISE_TO_PREPARED						= 3
+REQUEST_TO_SPAD								= 4
 
 -- Locally defined signal mesages
 SIGNAL_GO										= 10
@@ -187,10 +196,11 @@ gLightFlashOn			= 0
 gTimeSinceLastFlash	= 0
 
 -- debugging stuff
-gDebugId			= math.random(1, 100)
+DEBUG = true 									-- set to true to turn debugging on
 function DebugPrint( message )
-	if gDebugId ~= nil then
-		Print( "[" .. gDebugId .. "] " .. message )
+	local gId = Call ("GetId")
+	if (DEBUG) then
+		Print( gId .. message )
 	end
 end
 
@@ -260,6 +270,14 @@ end
 function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkIndex )
 	-- in which direction is the consist going?
 	gGoingForward = (prevFrontDist > frontDist)
+	if ( frontDist > 0 and backDist < 0 ) or ( frontDist < 0 and backDist > 0 ) then
+		if ( prevFrontDist > 0 and prevBackDist > 0 ) and linkIndex == 0 then
+			if ( gSignalState == STATE_BLOCKED or gSignalState == STATE_STOP ) then
+				DebugPrint("SPAD")
+				Call( "SendConsistMessage", SPAD_MESSAGE, "" )
+			end
+		end
+	end
 	-- only handle consist pass on active home signal links
 	if gHomeSignal and linkIndex >= 0 and not gDissabled[linkIndex] then
 		if (frontDist > 0 and backDist < 0) or (frontDist < 0 and backDist > 0) then
@@ -424,12 +442,23 @@ function SetSignalState()
 		newSignalState = STATE_STOP
 	elseif gConnectedLink > 0 and gLinkState[gConnectedLink] == STATE_BLOCKED then
 		-- exit signal facing an occupied block
-		newSignalState = STATE_STOP
-		
-		
+		newSignalState = STATE_STOP	
+	elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
+		-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
+		if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
+			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- diverging route, signal slow
+				newSignalState = STATE_SLOW
+			else
+				newSignalState = STATE_GO
+			end
+		else
+			newSignalState = STATE_STOP
+		end		
 	elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
+	-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
 		if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
-			-- Check if next signal is at red, show a slow signal if that is the case.
+			-- Check if next signal is at stop, show a slow signal if that is the case.
 			if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
 				newSignalState = STATE_GO
 			else
@@ -440,7 +469,7 @@ function SetSignalState()
 			newSignalState = STATE_SLOWER
 		end
 	elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
-		-- Check if next signal is at red, show a slow signal if that is the case.
+		-- Check if next signal is at stop, show a slow signal if that is the case.
 		if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
 			newSignalState = STATE_GO
 		else
@@ -449,6 +478,8 @@ function SetSignalState()
 	elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 		-- diverging route, signal slow
 		newSignalState = STATE_SLOW
+--	elseif (message == REQUEST_TO_SPAD) then
+--		newSignalState = STATE_CALL_ON
 	end
 
 	if newSignalState ~= gSignalState then
@@ -460,6 +491,8 @@ function SetSignalState()
 		else
 			if gSignalState == STATE_SLOWER then
 				Call( "Set2DMapSignalState", STATE_SLOW)
+--			elseif gSignalState == STATE_CALL_ON then
+--				Call( "Set2DMapSignalState", STATE_STOP)
 			else
 				Call( "Set2DMapSignalState", gSignalState)
 			end
@@ -469,6 +502,8 @@ function SetSignalState()
 		else
 			if gSignalState == STATE_SLOWER then
 				Call( "SendSignalMessage", SIGNAL_GO + STATE_SLOW, "", -1, 1, 0 )
+--			elseif gSignalState == STATE_CALL_ON then
+--				Call( "SendSignalMessage", SIGNAL_GO + STATE_STOP, "", -1, 1, 0 )
 			else
 				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
 			end
@@ -476,6 +511,7 @@ function SetSignalState()
 	end
 
 end
+
 
 --------------------------------------------------------------------------------------
 -- DEFAULT UPDATE
