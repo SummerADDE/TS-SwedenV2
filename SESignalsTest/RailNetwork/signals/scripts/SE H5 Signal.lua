@@ -102,21 +102,21 @@ end
 -- Switch the appropriate lights on and off based on our new state
 function DefaultSetLights()
 --	DebugPrint("DefaultSetLights()")
-	if (gSignalState == STATE_GO) then
+	if (gAnimState == ANIMSTATE_GO) then
 		SwitchLight( LIGHT_NODE_GREEN,		1 )
 		SwitchLight( LIGHT_NODE_RED,		0 )
 		SwitchLight( LIGHT_NODE_GREEN2,		0 )
 		SwitchLight( LIGHT_NODE_WHITE, 		0 )
 		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
 
-	elseif (gSignalState == STATE_SLOW) then
+	elseif (gAnimState == ANIMSTATE_SLOW) then
 		SwitchLight( LIGHT_NODE_GREEN,		1 )
 		SwitchLight( LIGHT_NODE_RED,		0 )
 		SwitchLight( LIGHT_NODE_GREEN2,		1 )
 		SwitchLight( LIGHT_NODE_WHITE, 		0 )
 		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
 
-	elseif (gSignalState == STATE_SLOWER) then
+	elseif (gAnimState == ANIMSTATE_SLOWER) then
 		SwitchLight( LIGHT_NODE_GREEN,		1 )
 		SwitchLight( LIGHT_NODE_RED,		0 )
 		SwitchLight( LIGHT_NODE_GREEN2,		1 )
@@ -146,19 +146,26 @@ STATE_GO										= 0
 STATE_SLOW										= 1
 STATE_STOP										= 2
 STATE_BLOCKED									= 3
-STATE_SLOWER									= 4
-STATE_CALL_ON									= 5
+STATE_UNDEFINED									= 8
 STATE_RESET										= 9
 
+-- Light states
+-- Huvudsignaler
+ANIMSTATE_GO										= 0
+ANIMSTATE_SLOW										= 1
+ANIMSTATE_SLOWER									= 2
+ANIMSTATE_STOP										= 3
+
 -- How long to stay off/on in each flash cycle
-LIGHT_FLASH_SECS	= 0.8
+LIGHT_FLASH_OFF_SECS	= 0.7
+LIGHT_FLASH_ON_SECS		= 0.3
 	
 -- Signal Messages (0-9 are reserved by code)
 RESET_SIGNAL_STATE							= 0
 INITIALISE_SIGNAL_TO_BLOCKED 				= 1
 JUNCTION_STATE_CHANGE						= 2
 INITIALISE_TO_PREPARED						= 3
-REQUEST_TO_SPAD								= 4
+REQUEST_TO_PASS_DANGER						= 4
 
 -- Locally defined signal mesages
 SIGNAL_GO										= 10
@@ -167,6 +174,8 @@ SIGNAL_STOP										= 12
 SIGNAL_BLOCKED									= 13
 OCCUPATION_INCREMENT							= 14
 OCCUPATION_DECREMENT							= 15
+DISTANCE_INCREMENT								= 16
+DISTANCE_DECREMENT								= 17
 
 -- What you need to add to a signal message number to turn it into the equivalent PASS message
 PASS_OFFSET										= 50
@@ -189,7 +198,8 @@ gHomeSignal 	= true
 gDistanceSignal = false
 gBlockSignal	= false				 	-- is this an intermediate block signal?
 gConnectedLink	= 0						-- which link is connected?
-gLightOn			= 0					-- set 3 greens or 2 greens in STATE_SLOW
+gAnimState		= -1					-- what's the current state of our lights?
+gCallOn 		= 0						-- Is Call on mode active?
 
 -- State of flashing light
 gLightFlashOn			= 0
@@ -276,19 +286,25 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 				DebugPrint("SPAD")
 				Call( "SendConsistMessage", SPAD_MESSAGE, "" )
 			end
+			if ( gCallOn == 1 ) then
+				gCallOn = 0
+			end
 		end
 	end
 	-- only handle consist pass on active home signal links
-	if gHomeSignal and linkIndex >= 0 and not gDissabled[linkIndex] then
+	if linkIndex >= 0 and not gDissabled[linkIndex] then
 		if (frontDist > 0 and backDist < 0) or (frontDist < 0 and backDist > 0) then
 			if (prevFrontDist < 0 and prevBackDist < 0) or (prevFrontDist > 0 and prevBackDist > 0) then
 				DebugPrint("OnConsistPass: Crossing started... linkIndex = " .. linkIndex .. ", gConnectedLink = " .. gConnectedLink)
 				if gGoingForward then
 					gOccupationTable[linkIndex] = gOccupationTable[linkIndex] + 1
 					DebugPrint("OnConsistPass: Forward INCREMENT... gOccupationTable[linkIndex]: " .. gOccupationTable[linkIndex])
-				elseif (linkIndex == 0) then
+				elseif linkIndex == 0 then
 					DebugPrint("OnConsistPass: A train starts passing link 0 in the opposite direction. Send OCCUPATION_INCREMENT.")
-					Call( "SendSignalMessage", OCCUPATION_INCREMENT, "", -1, 1, 0 )
+					if gHomeSignal then
+						Call( "SendSignalMessage", OCCUPATION_INCREMENT, "", -1, 1, 0 )
+					end
+					Call( "SendSignalMessage", DISTANCE_INCREMENT, "DoNotForward", -1, 1, 0 )
 				elseif (gConnectedLink == linkIndex) then
 					gOccupationTable[0] = gOccupationTable[0] + 1
 					DebugPrint("OnConsistPass: Backward INCREMENT... gOccupationTable[0]: " .. gOccupationTable[0])
@@ -302,9 +318,12 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 					gOccupationTable[linkIndex] = gOccupationTable[linkIndex] - 1
 					DebugPrint("OnConsistPass: Backward DECREMENT... gOccupationTable[" .. linkIndex .. "]: " .. gOccupationTable[linkIndex])
 				end
-			elseif (linkIndex == 0) then
+			elseif linkIndex == 0 then
 				DebugPrint("OnConsistPass: A train finishes passing link 0 in the normal direction, send OCCUPATION_DECREMENT.")
-				Call( "SendSignalMessage", OCCUPATION_DECREMENT, "", -1, 1, 0 )
+				if gHomeSignal then
+					Call( "SendSignalMessage", OCCUPATION_DECREMENT, "", -1, 1, 0 )
+				end
+				Call( "SendSignalMessage", DISTANCE_DECREMENT, "DoNotForward", -1, 1, 0 )
 			elseif (gConnectedLink == linkIndex) and (gOccupationTable[0] > 0) then
 				gOccupationTable[0] = gOccupationTable[0] - 1
 				DebugPrint("OnConsistPass: Forward DECREMENT... gOccupationTable[0]: " .. gOccupationTable[0])
@@ -359,7 +378,11 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		else
 			gLinkState[linkIndex] = message - SIGNAL_GO
 		end
-		gExpectState = gLinkState[gConnectedLink]
+		if (gConnectedLink >= 0) then
+			gExpectState = gLinkState[gConnectedLink]
+		else
+			gExpectState = STATE_UNDEFINED
+		end
 		DebugPrint("Link " .. linkIndex .. " is now " .. gLinkState[linkIndex])
 		if gHomeSignal then
 			SetSignalState()
@@ -392,7 +415,8 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 			SetSignalState()
 		end
 		
-	elseif (message == OCCUPATION_INCREMENT) then
+	elseif (message == OCCUPATION_INCREMENT and gHomeSignal or
+			  message == DISTANCE_INCREMENT and not gHomeSignal) then
 		-- update the occupation table for this signal given the information that a train has just entered this block
 		gOccupationTable[linkIndex] = gOccupationTable[linkIndex] + 1
 		gGoingForward = false
@@ -410,8 +434,12 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		-- and this signal spans a junction (ie, not a block signal)
 		if linkIndex == 0 and parameter == "0" then
 			gConnectedLink = Call( "GetConnectedLink", "10", 1, 0 )
-			if gConnectedLink > 0 then
+			if gConnectedLink >= 0 then
 				gExpectState = gLinkState[gConnectedLink]
+				DebugPrint("Expected state: " .. gExpectState)
+			else
+				gExpectState = STATE_UNDEFINED
+				DebugPrint("Expected state: undefined")
 			end
 			DebugPrint("Message: JUNCTION_STATE_CHANGE received ... activate link: " .. gConnectedLink)
 			SetSignalState()
@@ -420,6 +448,10 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 			-- When it reaches a link > 0 or a signal with only one link, it will be consumed
 			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
 		end
+	elseif (message == REQUEST_TO_PASS_DANGER) then
+		-- Train request to pass a red signal.
+		gCallOn = 1
+		SetSignalState()
 	end
 end
 
@@ -428,86 +460,97 @@ end
 -- Figures out what state to show and messages to send
 function SetSignalState()
 	local newSignalState = STATE_GO
-	if gBlockSignal then
+	local newAnimState = ANIMSTATE_GO
+	local newExpectState = STATE_RESET
+	if (gCallOn == 1) then
+		newSignalState = STATE_STOP
+		newAnimState = ANIMSTATE_STOP
+	elseif gBlockSignal then
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
+			newAnimState = ANIMSTATE_STOP
 		elseif gOccupationTable[0] > 0 or gLinkState[0] == STATE_BLOCKED then
 			newSignalState = STATE_BLOCKED
+			newAnimState = ANIMSTATE_STOP
 		end
 	elseif gOccupationTable[0] > 0 and not gGoingForward then
 		-- might be an entry signal with a consist going backwards into a block
 		newSignalState = STATE_BLOCKED
+		newAnimState = ANIMSTATE_STOP
 	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
 		-- no route or occupied
 		newSignalState = STATE_STOP
+		newAnimState = ANIMSTATE_STOP
 	elseif gConnectedLink > 0 and gLinkState[gConnectedLink] == STATE_BLOCKED then
 		-- exit signal facing an occupied block
 		newSignalState = STATE_STOP	
+		newAnimState = ANIMSTATE_STOP
 	elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
 		-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
-		if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
+		if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
 			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 				-- diverging route, signal slow
 				newSignalState = STATE_SLOW
+				newAnimState = ANIMSTATE_SLOW
 			else
 				newSignalState = STATE_GO
+				newAnimState = ANIMSTATE_GO
 			end
 		else
 			newSignalState = STATE_STOP
+			newAnimState = ANIMSTATE_STOP
 		end		
 	elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
 	-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
 		if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 			-- Check if next signal is at stop, show a slow signal if that is the case.
-			if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
+			if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
 				newSignalState = STATE_GO
+				newAnimState = ANIMSTATE_GO
 			else
-				newSignalState = STATE_SLOWER
+				newSignalState = STATE_SLOW
+				newAnimState = ANIMSTATE_SLOWER
 			end
 		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 			-- diverging route, signal slow
-			newSignalState = STATE_SLOWER
+			newSignalState = STATE_SLOW
+			newAnimState = ANIMSTATE_SLOWER			
 		end
 	elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 		-- Check if next signal is at stop, show a slow signal if that is the case.
-		if (gExpectState == STATE_GO) or (gExpectState == STATE_SLOW) then
+		if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
 			newSignalState = STATE_GO
+			newAnimState = ANIMSTATE_GO
 		else
 			newSignalState = STATE_SLOW
+			newAnimState = ANIMSTATE_SLOW
 		end
 	elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 		-- diverging route, signal slow
 		newSignalState = STATE_SLOW
---	elseif (message == REQUEST_TO_SPAD) then
---		newSignalState = STATE_CALL_ON
+		newAnimState = ANIMSTATE_SLOW
 	end
 
 	if newSignalState ~= gSignalState then
 		DebugPrint("SetSignalState() - signal state changed from " .. gSignalState .. " to " .. newSignalState .. " - sending message" )
 		gSignalState = newSignalState
-		SetLights()
-		if gSignalState >= STATE_STOP then
-			Call( "Set2DMapSignalState", STATE_STOP)
-		else
-			if gSignalState == STATE_SLOWER then
-				Call( "Set2DMapSignalState", STATE_SLOW)
---			elseif gSignalState == STATE_CALL_ON then
---				Call( "Set2DMapSignalState", STATE_STOP)
-			else
-				Call( "Set2DMapSignalState", gSignalState)
-			end
-		end
 		if gSignalState == STATE_BLOCKED and not gBlockSignal then
 			Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
 		else
-			if gSignalState == STATE_SLOWER then
-				Call( "SendSignalMessage", SIGNAL_GO + STATE_SLOW, "", -1, 1, 0 )
---			elseif gSignalState == STATE_CALL_ON then
---				Call( "SendSignalMessage", SIGNAL_GO + STATE_STOP, "", -1, 1, 0 )
-			else
-				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
-			end
+			Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
 		end
+	end
+	
+	if newAnimState ~= gAnimState then
+		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
+		gAnimState = newAnimState
+		SetLights()
+		Call( "Set2DMapProSignalState", newAnimState )
+	end
+	
+	if newExpectState ~= gExpectState then
+		DebugPrint("SetSignalState() - signal aspect changed from " .. newExpectState .. " to " .. gExpectState .. " - change lights" )
+		newExpectState = gExpectState
 	end
 
 end
@@ -522,11 +565,28 @@ function Update( time )
 		InitialiseSignal()			
 	else
 		gTimeSinceLastFlash = gTimeSinceLastFlash + time
-		if gTimeSinceLastFlash >= LIGHT_FLASH_SECS then
+		
+		-- If we're on and we've been on long enough, switch off
+		if gLightFlashOn == 1 and gTimeSinceLastFlash >= LIGHT_FLASH_OFF_SECS then
 			Animate()
-			gLightFlashOn = 1 - gLightFlashOn
+			newLightState = 0
+			gLightFlashOn = 0
+			gTimeSinceLastFlash = 0
+			
+		elseif gLightFlashOn == 0 and gTimeSinceLastFlash >= LIGHT_FLASH_ON_SECS then
+			Animate()
+			newLightState = 1
+			gLightFlashOn = 1
 			gTimeSinceLastFlash = 0
 		end
 	end
 end
 
+--------------------------------------------------------------------------------------
+-- GET SIGNAL STATE
+-- Gets the current state of the signal - blocked, warning or clear. 
+-- The state info is used for PZB scripting.
+--
+function GetSignalState()
+	return gSignalState
+end
