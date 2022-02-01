@@ -10,8 +10,14 @@
 --------------------------------------------------------------------------------------
 -- ASCII code for GetLinkFeatherChar
 -- Code: 49		Token: 1	Usage: Check next signal. If gExpectState = STATE_STOP then newSignalState = STATE_STOP.
--- Code: 50		Token: 2	Usage: For Shunt signal to show "Pass, Check switches".
+-- Code: 50		Token: 2	Usage: For Shunt signal to show "Pass, Check switches" - Only for yard entries.
 -- Code: 51		Token: 3	Usage: For H5 signals. newSignalState = STATE_SLOWER and not STATE_SLOW.
+-- Code: 52		Token: 4	Usage: For Yard entry.
+-- Code: 53		Token: 5	Usage:
+-- Code: 54		Token: 6	Usage:
+-- Code: 55		Token: 7	Usage:
+-- Code: 56		Token: 8	Usage:
+-- Code: 57		Token: 9	Usage:
 
 --------------------------------------------------------------------------------------
 -- INITIALISE
@@ -21,17 +27,27 @@ function Initialise()
 	if (SIGNAL_HEAD_NAME == nil) then
 		SIGNAL_HEAD_NAME = ""
 	end
+	if (SIGNAL_SHUNT_NAME == nil) then
+		SIGNAL_SHUNT_NAME = ""
+	end
 	-- Add support for custom text & numbers to child objects.
 	local number = Call ("GetId")
 	Call ("Post:SetText", number, 0)
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
 	SIGNAL_HEAD_NAME 		= "SE H5:"
+	SIGNAL_SHUNT_NAME 		= "SE DV4:"
 	-- Set our light node names
+	-- Main
 	LIGHT_NODE_GREEN		= "G1"
 	LIGHT_NODE_RED			= "R1"
 	LIGHT_NODE_GREEN2		= "G2"
 	LIGHT_NODE_WHITE		= "W1"
 	LIGHT_NODE_GREEN3		= "G3"
+	-- Shunt
+	LIGHT_NODE_WHITE1		= "W1"
+	LIGHT_NODE_WHITE2		= "W2"
+	LIGHT_NODE_WHITE3		= "W3"
+	LIGHT_NODE_WHITE4		= "W4"
 	gDistanceSignal = true
 	BaseInitialise()
 end
@@ -62,7 +78,7 @@ end
 -- SWITCH LIGHT
 -- Turns the selected light node on (1) / off (0)
 -- if the light node exists for this signal
-function SwitchLight( lightNode, state, head )
+function SwitchLight( head, lightNode, state )
 
 	-- If no head is specified, assume that signal only has one
 	if head == nil then
@@ -83,17 +99,17 @@ function DefaultAnimate()
 		return
 	end
 	if (gExpectState == STATE_GO) then
-		SwitchLight( LIGHT_NODE_GREEN2, 0 )
-		SwitchLight( LIGHT_NODE_WHITE, gLightFlashOn )
-		SwitchLight( LIGHT_NODE_GREEN3, 0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
 	elseif (gExpectState == STATE_SLOW) then
-		SwitchLight( LIGHT_NODE_GREEN2, gLightFlashOn )
-		SwitchLight( LIGHT_NODE_WHITE, 0 )
-		SwitchLight( LIGHT_NODE_GREEN3, gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	gLightFlashOn )
 	else	-- stop or blocked
-		SwitchLight( LIGHT_NODE_GREEN2, gLightFlashOn )
-		SwitchLight( LIGHT_NODE_WHITE, 0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
 	end
 end
 
@@ -103,32 +119,54 @@ end
 function DefaultSetLights()
 --	DebugPrint("DefaultSetLights()")
 	if (gAnimState == ANIMSTATE_GO) then
-		SwitchLight( LIGHT_NODE_GREEN,		1 )
-		SwitchLight( LIGHT_NODE_RED,		0 )
-		SwitchLight( LIGHT_NODE_GREEN2,		0 )
-		SwitchLight( LIGHT_NODE_WHITE, 		0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
 
 	elseif (gAnimState == ANIMSTATE_SLOW) then
-		SwitchLight( LIGHT_NODE_GREEN,		1 )
-		SwitchLight( LIGHT_NODE_RED,		0 )
-		SwitchLight( LIGHT_NODE_GREEN2,		1 )
-		SwitchLight( LIGHT_NODE_WHITE, 		0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
 
 	elseif (gAnimState == ANIMSTATE_SLOWER) then
-		SwitchLight( LIGHT_NODE_GREEN,		1 )
-		SwitchLight( LIGHT_NODE_RED,		0 )
-		SwitchLight( LIGHT_NODE_GREEN2,		1 )
-		SwitchLight( LIGHT_NODE_WHITE, 		0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	1 )
 
 	else	-- stop or blocked
-		SwitchLight( LIGHT_NODE_GREEN,		0 )
-		SwitchLight( LIGHT_NODE_RED,		1 )
-		SwitchLight( LIGHT_NODE_GREEN2,		0 )
-		SwitchLight( LIGHT_NODE_WHITE, 		0 )
-		SwitchLight( LIGHT_NODE_GREEN3, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+	end
+	
+	if (gShuntState == SHUNTSTATE_GO) then
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE1, 		0 )
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE2, 		1 )	-- .o
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE3, 		0 )	-- .o
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE4, 		1 )
+	elseif (gShuntState == SHUNTSTATE_SLOW) then
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE1, 		1 )
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE2, 		0 )	-- o.
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE3, 		0 )	-- .o
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE4, 		1 )
+	elseif (gShuntState == SHUNTSTATE_UNPROTECTED) then
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE1, 		0 )
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE2, 		1 )	-- .o
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE3, 		1 )	-- o.
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE4, 		0 )
+	else
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE1, 		0 )
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE2, 		0 )	-- ..
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE3, 		1 )	-- oo
+		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE4, 		1 )
 	end
 end
 
@@ -155,6 +193,12 @@ ANIMSTATE_GO										= 0
 ANIMSTATE_SLOW										= 1
 ANIMSTATE_SLOWER									= 2
 ANIMSTATE_STOP										= 3
+
+-- Dvärgsignaler
+SHUNTSTATE_GO										= 10
+SHUNTSTATE_SLOW										= 11
+SHUNTSTATE_UNPROTECTED								= 12
+SHUNTSTATE_STOP										= 13
 
 -- How long to stay off/on in each flash cycle
 LIGHT_FLASH_OFF_SECS	= 0.7
@@ -198,7 +242,8 @@ gHomeSignal 	= true
 gDistanceSignal = false
 gBlockSignal	= false				 	-- is this an intermediate block signal?
 gConnectedLink	= 0						-- which link is connected?
-gAnimState		= -1					-- what's the current state of our lights?
+gAnimState		= -1					-- what's the current state of our main lights?
+gShuntState		= -1					-- what's the current state of our shunt lights?
 gCallOn 		= 0						-- Is Call on mode active?
 
 -- State of flashing light
@@ -231,7 +276,7 @@ function BaseInitialise()
 	gDissabled = {}								-- is this link dissabled?
 	gOccupationTable = {}						-- how many trains are in this part of our block?
 	for link = 0, gLinkCount - 1 do
-		gLinkState[link] = STATE_GO
+		gLinkState[link] = STATE_RESET
 		gDissabled[link] = false
 		gOccupationTable[link] = 0
 	end
@@ -255,6 +300,9 @@ function InitialiseSignal()
 			gDissabled[link] = true
 			gLinkCount = gLinkCount - 1
 		end
+	end
+	for link = 1, gLinkCount - 1 do
+		gLinkState[gConnectedLink] = STATE_RESET
 	end
 	
 	gBlockSignal = gHomeSignal and (gLinkCount == 1)	
@@ -448,6 +496,10 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 			-- When it reaches a link > 0 or a signal with only one link, it will be consumed
 			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
 		end
+		if ( gCallOn == 1 ) then
+			gCallOn = 0
+			SetSignalState()
+		end
 	elseif (message == REQUEST_TO_PASS_DANGER) then
 		-- Train request to pass a red signal.
 		gCallOn = 1
@@ -461,74 +513,93 @@ end
 function SetSignalState()
 	local newSignalState = STATE_GO
 	local newAnimState = ANIMSTATE_GO
-	local newExpectState = STATE_RESET
+	local newShuntState = SHUNTSTATE_GO
 	if (gCallOn == 1) then
 		newSignalState = STATE_STOP
 		newAnimState = ANIMSTATE_STOP
+		if gOccupationTable[gConnectedLink] > 0 then
+			-- Train in block. Show slow.
+			newShuntState = SHUNTSTATE_SLOW
+		else
+			newShuntState = SHUNTSTATE_GO
+		end
 	elseif gBlockSignal then
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
 			newAnimState = ANIMSTATE_STOP
+			newShuntState = SHUNTSTATE_STOP
 		elseif gOccupationTable[0] > 0 or gLinkState[0] == STATE_BLOCKED then
 			newSignalState = STATE_BLOCKED
 			newAnimState = ANIMSTATE_STOP
+			newShuntState = SHUNTSTATE_STOP
 		end
 	elseif gOccupationTable[0] > 0 and not gGoingForward then
 		-- might be an entry signal with a consist going backwards into a block
 		newSignalState = STATE_BLOCKED
 		newAnimState = ANIMSTATE_STOP
+		newShuntState = SHUNTSTATE_STOP
 	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
 		-- no route or occupied
 		newSignalState = STATE_STOP
 		newAnimState = ANIMSTATE_STOP
-	elseif gConnectedLink > 0 and gLinkState[gConnectedLink] == STATE_BLOCKED then
-		-- exit signal facing an occupied block
-		newSignalState = STATE_STOP	
-		newAnimState = ANIMSTATE_STOP
-	elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
-		-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
-		if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
-			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+		newShuntState = SHUNTSTATE_STOP
+	elseif gConnectedLink > 0 then
+		if gLinkState[gConnectedLink] == STATE_BLOCKED then
+			-- exit signal facing an occupied block
+			newSignalState = STATE_STOP	
+			newAnimState = ANIMSTATE_STOP
+			newShuntState = SHUNTSTATE_STOP
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
+			-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
+			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+				if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+					-- diverging route, signal slow
+					newSignalState = STATE_SLOW
+					newAnimState = ANIMSTATE_SLOW
+				else
+					newSignalState = STATE_GO
+					newAnimState = ANIMSTATE_GO
+				end
+				newShuntState = SHUNTSTATE_GO
+			else
+				newSignalState = STATE_STOP
+				newAnimState = ANIMSTATE_STOP
+				newShuntState = SHUNTSTATE_STOP
+			end		
+		elseif SIGNAL_HEAD_NAME == "SE H5:" and Call("GetLinkFeatherChar", gConnectedLink) == 51 then
+		-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
+			if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
+				-- Check if next signal is at stop, show a slow signal if that is the case.
+				if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+					newSignalState = STATE_GO
+					newAnimState = ANIMSTATE_GO
+				else
+					newSignalState = STATE_SLOW
+					newAnimState = ANIMSTATE_SLOWER
+				end
+				newShuntState = SHUNTSTATE_GO
+			elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 				-- diverging route, signal slow
 				newSignalState = STATE_SLOW
-				newAnimState = ANIMSTATE_SLOW
-			else
-				newSignalState = STATE_GO
-				newAnimState = ANIMSTATE_GO
+				newAnimState = ANIMSTATE_SLOWER	
+				newShuntState = SHUNTSTATE_GO				
 			end
-		else
-			newSignalState = STATE_STOP
-			newAnimState = ANIMSTATE_STOP
-		end		
-	elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
-	-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
-		if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
+		elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 			-- Check if next signal is at stop, show a slow signal if that is the case.
-			if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
+			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
 				newSignalState = STATE_GO
 				newAnimState = ANIMSTATE_GO
 			else
 				newSignalState = STATE_SLOW
-				newAnimState = ANIMSTATE_SLOWER
+				newAnimState = ANIMSTATE_SLOW
 			end
+			newShuntState = SHUNTSTATE_GO
 		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 			-- diverging route, signal slow
 			newSignalState = STATE_SLOW
-			newAnimState = ANIMSTATE_SLOWER			
-		end
-	elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
-		-- Check if next signal is at stop, show a slow signal if that is the case.
-		if (newExpectState == STATE_GO) or (newExpectState == STATE_SLOW) then
-			newSignalState = STATE_GO
-			newAnimState = ANIMSTATE_GO
-		else
-			newSignalState = STATE_SLOW
 			newAnimState = ANIMSTATE_SLOW
+			newShuntState = SHUNTSTATE_GO
 		end
-	elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-		-- diverging route, signal slow
-		newSignalState = STATE_SLOW
-		newAnimState = ANIMSTATE_SLOW
 	end
 
 	if newSignalState ~= gSignalState then
@@ -541,6 +612,12 @@ function SetSignalState()
 		end
 	end
 	
+	if newShuntState ~= gShuntState then
+		DebugPrint("SetSignalState() - signal state changed from " .. gShuntState .. " to " .. newShuntState .. " - sending message" )
+		gShuntState = newShuntState
+		SetLights()
+	end
+	
 	if newAnimState ~= gAnimState then
 		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
 		gAnimState = newAnimState
@@ -548,10 +625,10 @@ function SetSignalState()
 		Call( "Set2DMapProSignalState", newAnimState )
 	end
 	
-	if newExpectState ~= gExpectState then
-		DebugPrint("SetSignalState() - signal aspect changed from " .. newExpectState .. " to " .. gExpectState .. " - change lights" )
-		newExpectState = gExpectState
-	end
+--	if newExpectState ~= gExpectState then
+--		DebugPrint("SetSignalState() - signal aspect changed from " .. newExpectState .. " to " .. gExpectState .. " - change lights" )
+--		newExpectState = gExpectState		gShuntState == SHUNTSTATE_GO
+--	end
 
 end
 
@@ -585,7 +662,7 @@ end
 --------------------------------------------------------------------------------------
 -- GET SIGNAL STATE
 -- Gets the current state of the signal - blocked, warning or clear. 
--- The state info is used for PZB scripting.
+-- The state info is used for TAB Funcionality.
 --
 function GetSignalState()
 	return gSignalState
