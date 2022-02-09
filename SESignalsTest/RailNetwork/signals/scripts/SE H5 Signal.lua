@@ -10,9 +10,9 @@
 --------------------------------------------------------------------------------------
 -- ASCII code for GetLinkFeatherChar
 -- Code: 49		Token: 1	Usage: Check next signal. If gExpectState = STATE_STOP then newSignalState = STATE_STOP.
--- Code: 50		Token: 2	Usage: For Shunt signal to show "Pass, Check switches" - Only for yard entries.
+-- Code: 50		Token: 2	Usage: For Yard entry. - Main signal shows stop and shunt script is used.
 -- Code: 51		Token: 3	Usage: For H5 signals. newSignalState = STATE_SLOWER and not STATE_SLOW.
--- Code: 52		Token: 4	Usage: For Yard entry.
+-- Code: 52		Token: 4	Usage: 
 -- Code: 53		Token: 5	Usage:
 -- Code: 54		Token: 6	Usage:
 -- Code: 55		Token: 7	Usage:
@@ -245,6 +245,7 @@ gConnectedLink	= 0						-- which link is connected?
 gAnimState		= -1					-- what's the current state of our main lights?
 gShuntState		= -1					-- what's the current state of our shunt lights?
 gCallOn 		= 0						-- Is Call on mode active?
+gShuntLink		= 0						-- Is this link a shunkt path?
 
 -- State of flashing light
 gLightFlashOn			= 0
@@ -273,10 +274,12 @@ function BaseInitialise()
 	-- Initialise global variables
 	gLinkCount = Call( "GetLinkCount" )		-- number of links this signal has
 	gLinkState = {}								-- state of line beyond this link
+	gYardEntry = {}								-- is this link going inside a yard?
 	gDissabled = {}								-- is this link dissabled?
 	gOccupationTable = {}						-- how many trains are in this part of our block?
 	for link = 0, gLinkCount - 1 do
 		gLinkState[link] = STATE_RESET
+		gYardEntry[link] = false
 		gDissabled[link] = false
 		gOccupationTable[link] = 0
 	end
@@ -298,6 +301,7 @@ function InitialiseSignal()
 		DebugPrint("Link " .. link .. " connected to " .. connectedLink)
 		if (connectedLink ~= -1) then
 			gDissabled[link] = true
+			gYardEntry[link] = true
 			gLinkCount = gLinkCount - 1
 		end
 	end
@@ -330,7 +334,7 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 	gGoingForward = (prevFrontDist > frontDist)
 	if ( frontDist > 0 and backDist < 0 ) or ( frontDist < 0 and backDist > 0 ) then
 		if ( prevFrontDist > 0 and prevBackDist > 0 ) and linkIndex == 0 then
-			if ( gSignalState == STATE_BLOCKED or gSignalState == STATE_STOP ) then
+			if ( gSignalState == STATE_BLOCKED or gSignalState == STATE_STOP ) and not gShuntLink == 1 then
 				DebugPrint("SPAD")
 				Call( "SendConsistMessage", SPAD_MESSAGE, "" )
 			end
@@ -345,8 +349,10 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 			if (prevFrontDist < 0 and prevBackDist < 0) or (prevFrontDist > 0 and prevBackDist > 0) then
 				DebugPrint("OnConsistPass: Crossing started... linkIndex = " .. linkIndex .. ", gConnectedLink = " .. gConnectedLink)
 				if gGoingForward then
-					gOccupationTable[linkIndex] = gOccupationTable[linkIndex] + 1
-					DebugPrint("OnConsistPass: Forward INCREMENT... gOccupationTable[linkIndex]: " .. gOccupationTable[linkIndex])
+					if not gYardEntry[linkIndex] then
+						gOccupationTable[linkIndex] = gOccupationTable[linkIndex] + 1
+						DebugPrint("OnConsistPass: Forward INCREMENT... gOccupationTable[linkIndex]: " .. gOccupationTable[linkIndex])
+					end
 				elseif linkIndex == 0 then
 					DebugPrint("OnConsistPass: A train starts passing link 0 in the opposite direction. Send OCCUPATION_INCREMENT.")
 					if gHomeSignal then
@@ -362,7 +368,7 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 		elseif (prevFrontDist < 0 and prevBackDist > 0) or (prevFrontDist > 0 and prevBackDist < 0) then
 			DebugPrint("OnConsistPass: Crossing cleared... linkIndex = " .. linkIndex .. ", gConnectedLink = " .. gConnectedLink)
 			if not gGoingForward then
-				if gOccupationTable[linkIndex] > 0 then
+				if not gYardEntry[linkIndex] and gOccupationTable[linkIndex] > 0 then
 					gOccupationTable[linkIndex] = gOccupationTable[linkIndex] - 1
 					DebugPrint("OnConsistPass: Backward DECREMENT... gOccupationTable[" .. linkIndex .. "]: " .. gOccupationTable[linkIndex])
 				end
@@ -413,7 +419,7 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 	end
 
 	-- messages arriving on a yard entry or dissabled link should be ignored
-	if gDissabled[linkIndex] then
+	if (gYardEntry[linkIndex] or gDissabled[linkIndex]) then
 		return	-- Do nothing
 	end
 
@@ -515,6 +521,8 @@ function SetSignalState()
 	local newAnimState = ANIMSTATE_GO
 	local newShuntState = SHUNTSTATE_GO
 	if (gCallOn == 1) then
+		gYardEntry[gConnectedLink] = false
+		gShuntLink = 0
 		newSignalState = STATE_STOP
 		newAnimState = ANIMSTATE_STOP
 		if gOccupationTable[gConnectedLink] > 0 then
@@ -524,6 +532,8 @@ function SetSignalState()
 			newShuntState = SHUNTSTATE_GO
 		end
 	elseif gBlockSignal then
+		gYardEntry[Link] = false
+		gShuntLink = 0
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
 			newAnimState = ANIMSTATE_STOP
@@ -537,20 +547,49 @@ function SetSignalState()
 		-- might be an entry signal with a consist going backwards into a block
 		newSignalState = STATE_BLOCKED
 		newAnimState = ANIMSTATE_STOP
-		newShuntState = SHUNTSTATE_STOP
+		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- Unprotected yard.
+			gShuntLink = 1
+			gYardEntry[gConnectedLink] = true
+			newShuntState = SHUNTSTATE_UNPROTECTED		
+		else
+			gShuntLink = 0
+			gYardEntry[gConnectedLink] = false
+			newShuntState = SHUNTSTATE_STOP
+		end
 	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
 		-- no route or occupied
 		newSignalState = STATE_STOP
 		newAnimState = ANIMSTATE_STOP
-		newShuntState = SHUNTSTATE_STOP
+		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- Unprotected yard.
+			gShuntLink = 1
+			gYardEntry[gConnectedLink] = true
+			newShuntState = SHUNTSTATE_UNPROTECTED		
+		else
+			gShuntLink = 0
+			gYardEntry[gConnectedLink] = false
+			newShuntState = SHUNTSTATE_STOP
+		end
 	elseif gConnectedLink > 0 then
 		if gLinkState[gConnectedLink] == STATE_BLOCKED then
 			-- exit signal facing an occupied block
 			newSignalState = STATE_STOP	
 			newAnimState = ANIMSTATE_STOP
-			newShuntState = SHUNTSTATE_STOP
+			if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- Unprotected yard.
+				gShuntLink = 1
+				gYardEntry[gConnectedLink] = true
+				newShuntState = SHUNTSTATE_UNPROTECTED		
+			else
+				gShuntLink = 0
+				gYardEntry[gConnectedLink] = false
+				newShuntState = SHUNTSTATE_STOP
+			end
 		elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
 			-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
 			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
 				if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 					-- diverging route, signal slow
@@ -566,8 +605,10 @@ function SetSignalState()
 				newAnimState = ANIMSTATE_STOP
 				newShuntState = SHUNTSTATE_STOP
 			end		
-		elseif SIGNAL_HEAD_NAME == "SE H5:" and Call("GetLinkFeatherChar", gConnectedLink) == 51 then
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
 		-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
 			if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 				-- Check if next signal is at stop, show a slow signal if that is the case.
 				if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
@@ -586,6 +627,8 @@ function SetSignalState()
 			end
 		elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
 			-- Check if next signal is at stop, show a slow signal if that is the case.
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
 			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
 				newSignalState = STATE_GO
 				newAnimState = ANIMSTATE_GO
@@ -596,9 +639,25 @@ function SetSignalState()
 			newShuntState = SHUNTSTATE_GO
 		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
 			-- diverging route, signal slow
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
 			newSignalState = STATE_SLOW
 			newAnimState = ANIMSTATE_SLOW
 			newShuntState = SHUNTSTATE_GO
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 50 then
+			-- Check if the Character field for this link is set to "2". if so, Shunt-only route. Only use shunt signal.
+			newSignalState = STATE_STOP
+			newAnimState = ANIMSTATE_STOP
+			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- Unprotected yard.
+				gShuntLink = 1
+				gYardEntry[gConnectedLink] = true
+				newShuntState = SHUNTSTATE_UNPROTECTED		
+			else
+				gShuntLink = 0
+				gYardEntry[gConnectedLink] = false
+				newShuntState = SHUNTSTATE_GO		
+			end
 		end
 	end
 
