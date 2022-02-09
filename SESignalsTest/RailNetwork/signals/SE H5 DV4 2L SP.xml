@@ -204,8 +204,46 @@
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000C09690B33F" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000C09690B33F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">-0.12</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+									</Element>
+								</cHcRMatrix4x4>
+							</Matrix>
+						</cEntityContainerBlueprint-sChild>
+					</Children>
+										<Children>
+						<cEntityContainerBlueprint-sChild d:id="30427168">
+							<ChildName d:type="cDeltaString">GetId</ChildName>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">SummerADDE</Provider>
+											<Product d:type="cDeltaString">SESignalsTest</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SS.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<Matrix>
+								<cHcRMatrix4x4>
+									<Element>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">-1</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000C09690B33F" d:precision="string">0.725</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">-0.20</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>
 								</cHcRMatrix4x4>
@@ -229,21 +267,21 @@
 							<Matrix>
 								<cHcRMatrix4x4>
 									<Element>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="00000040E17AB43F" d:precision="string">0.08</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">-0.75</e>
+										<e d:type="sFloat32" d:alt_encoding="00000040E17AB43F" d:precision="string">-0.12</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>
 								</cHcRMatrix4x4>
