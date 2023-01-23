@@ -314,10 +314,12 @@ function InitialiseSignal()
 	if gBlockSignal then
 		SetSignalState()
 		DebugPrint("BlockSignal[" .. gLinkCount .. "]")
+		Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
 	elseif gHomeSignal then
 		gConnectedLink = Call( "GetConnectedLink", "10", 1, 0 )
 		SetSignalState()
 		DebugPrint("HomeSignal[" .. gLinkCount .. "]")
+		Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
 	end
 	if gDistanceSignal then
 		DebugPrint("DistanceSignal[" .. gLinkCount .. "]")
@@ -429,13 +431,14 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		if gBlockSignal and message == SIGNAL_STOP and parameter == "BLOCKED" then
 			-- train coming our direction in an entry signal, block occupied
 			gLinkState[0] = STATE_BLOCKED
+			
 		else
 			gLinkState[linkIndex] = message - SIGNAL_GO
 		end
 		if (gConnectedLink >= 0) then
 			gExpectState = gLinkState[gConnectedLink]
-		else
-			gExpectState = STATE_UNDEFINED
+--		else
+--			gExpectState = STATE_UNDEFINED
 		end
 		DebugPrint("Link " .. linkIndex .. " is now " .. gLinkState[linkIndex])
 		if gHomeSignal then
@@ -491,9 +494,12 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 			if gConnectedLink >= 0 then
 				gExpectState = gLinkState[gConnectedLink]
 				DebugPrint("Expected state: " .. gExpectState)
-			else
-				gExpectState = STATE_UNDEFINED
-				DebugPrint("Expected state: undefined")
+			elseif (gConnectedLink == 0) then
+				gExpectState = gLinkState[Link]
+				DebugPrint("Expected state: " .. gExpectState)
+--			else
+--				gExpectState = STATE_UNDEFINED
+--				DebugPrint("Expected state: undefined")
 			end
 			DebugPrint("Message: JUNCTION_STATE_CHANGE received ... activate link: " .. gConnectedLink)
 			SetSignalState()
@@ -532,7 +538,7 @@ function SetSignalState()
 			newShuntState = SHUNTSTATE_GO
 		end
 	elseif gBlockSignal then
-		gYardEntry[Link] = false
+		gYardEntry[gConnectedLink] = false
 		gShuntLink = 0
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
