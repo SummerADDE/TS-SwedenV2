@@ -2,16 +2,16 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE SignalV2 H2 1L SP</Name>
+			<Name d:type="cDeltaString">SE SignalV2 H2 1L SB</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 H2 1L SP</English>
-							<French d:type="cDeltaString">SE SignalV2 H2 1L SP</French>
-							<Italian d:type="cDeltaString">SE SignalV2 H2 1L SP</Italian>
-							<German d:type="cDeltaString">SE SignalV2 H2 1L SP</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 H2 1L SP</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 H2 1L SB</English>
+							<French d:type="cDeltaString">SE SignalV2 H2 1L SB</French>
+							<Italian d:type="cDeltaString">SE SignalV2 H2 1L SB</Italian>
+							<German d:type="cDeltaString">SE SignalV2 H2 1L SB</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 H2 1L SB</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -146,7 +146,7 @@
 											<Product d:type="cDeltaString">SESignalsTest</Product>
 										</iBlueprintLibrary-cBlueprintSetID>
 									</BlueprintSetID>
-									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SP.xml</BlueprintID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SB.xml</BlueprintID>
 								</iBlueprintLibrary-cAbsoluteBlueprintID>
 							</BlueprintID>
 							<Matrix>
