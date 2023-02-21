@@ -1,61 +1,4 @@
 --------------------------------------------------------------------------------------
--- KMW / Anders Eriksson
--- 090108 First version
--- 220119 Massively updated version by SummerADDE / Andreas Ulvebring
---------------------------------------------------------------------------------------
-
---include=SE CommonScript.lua
---include=Signal CommonScript.lua
-
---------------------------------------------------------------------------------------
--- ASCII code for GetLinkFeatherChar
--- Code: 49		Token: 1	Usage: Check next signal. If gExpectState = STATE_STOP then newSignalState = STATE_STOP.
--- Code: 50		Token: 2	Usage: For Yard entry. - Main signal shows stop and shunt script is used.
--- Code: 51		Token: 3	Usage: For H5 signals. newSignalState = STATE_SLOWER and not STATE_SLOW.
--- Code: 52		Token: 4	Usage: 
--- Code: 53		Token: 5	Usage:
--- Code: 54		Token: 6	Usage:
--- Code: 55		Token: 7	Usage:
--- Code: 56		Token: 8	Usage:
--- Code: 57		Token: 9	Usage:
-
---------------------------------------------------------------------------------------
--- INITIALISE
--- Signal specific initialise function
-function Initialise()
-	-- If we're a signal head, we don't need to know our own name to switch our lights on and off
-	if (SIGNAL_HEAD_NAME == nil) then
-		SIGNAL_HEAD_NAME = ""
-	end
-	if (SIGNAL_SHUNT_NAME == nil) then
-		SIGNAL_SHUNT_NAME = ""
-	end
-	-- Add support for custom text & numbers to child objects.
-	local number = Call ("GetId")
-	Call ("Post:SetText", number, 0)
-	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
---	SIGNAL_HEAD_NAME 		= ""
-	SIGNAL_SHUNT_NAME 		= "SE DV4:"
-	-- Set our light node names
-	-- Main
---	LIGHT_NODE_GREEN		= "G1"
---	LIGHT_NODE_RED			= "R1"
---	LIGHT_NODE_GREEN2		= "G2"
---	LIGHT_NODE_WHITE		= "W1"
---	LIGHT_NODE_GREEN3		= "G3"
-	-- Shunt
---LIGHT_NODE_RED			= "R1"
---LIGHT_NODE_GREEN1			= "G1"
---LIGHT_NODE_GREEN2			= "G2"
-	LIGHT_NODE_WHITE1		= "W1"
-	LIGHT_NODE_WHITE2		= "W2"
-	LIGHT_NODE_WHITE3		= "W3"
-	LIGHT_NODE_WHITE4		= "W4"
-	gDistanceSignal = true
-	BaseInitialise()
-end
-
---------------------------------------------------------------------------------------
 -- ANIMATE
 -- Any animation that needs doing
 function Animate()
@@ -98,13 +41,57 @@ end
 -- Animate Swedish distance signals
 -- switch on/off the appropriate lights
 function DefaultAnimate()
-
+	if gHomeSignal and (gSignalState ~= STATE_GO) then
+		return
+	end
+	if (gExpectState == STATE_GO) then
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+	elseif (gExpectState == STATE_SLOW) then
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	gLightFlashOn )
+	else	-- stop or blocked
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2, 	gLightFlashOn )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+	end
 end
 
 --------------------------------------------------------------------------------------
 -- Swedish home signals SetLights
 -- Switch the appropriate lights on and off based on our new state
 function DefaultSetLights()
+--	DebugPrint("DefaultSetLights()")
+	if (gAnimState == ANIMSTATE_GO) then
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+
+	elseif (gAnimState == ANIMSTATE_SLOW) then
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+
+	elseif (gAnimState == ANIMSTATE_SLOWER) then
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	1 )
+
+	else	-- stop or blocked
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		1 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN2,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_WHITE, 	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN3, 	0 )
+	end
 	
 	if (gShuntState == SHUNTSTATE_GO) then
 		SwitchLight( SIGNAL_SHUNT_NAME, LIGHT_NODE_WHITE1, 		0 )
@@ -486,46 +473,140 @@ function SetSignalState()
 		gYardEntry[gConnectedLink] = false
 		gShuntLink = 0
 		newSignalState = STATE_STOP
+		newAnimState = ANIMSTATE_STOP
 		if gOccupationTable[gConnectedLink] > 0 then
 			-- Train in block. Show slow.
 			newShuntState = SHUNTSTATE_SLOW
 		else
 			newShuntState = SHUNTSTATE_GO
 		end
-	elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-		-- Unprotected yard.
-		gShuntLink = 1
-		gYardEntry[gConnectedLink] = true
-		newShuntState = SHUNTSTATE_UNPROTECTED			
 	elseif gBlockSignal then
 		gYardEntry[gConnectedLink] = false
 		gShuntLink = 0
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
+			newAnimState = ANIMSTATE_STOP
 			newShuntState = SHUNTSTATE_STOP
 		elseif gOccupationTable[0] > 0 or gLinkState[0] == STATE_BLOCKED then
 			newSignalState = STATE_BLOCKED
+			newAnimState = ANIMSTATE_STOP
 			newShuntState = SHUNTSTATE_STOP
 		end
 	elseif gOccupationTable[0] > 0 and not gGoingForward then
 		-- might be an entry signal with a consist going backwards into a block
 		newSignalState = STATE_BLOCKED
-		gShuntLink = 0
-		gYardEntry[gConnectedLink] = false
-		newShuntState = SHUNTSTATE_STOP
+		newAnimState = ANIMSTATE_STOP
+		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- Unprotected yard.
+			gShuntLink = 1
+			gYardEntry[gConnectedLink] = true
+			newShuntState = SHUNTSTATE_UNPROTECTED		
+		else
+			gShuntLink = 0
+			gYardEntry[gConnectedLink] = false
+			newShuntState = SHUNTSTATE_STOP
+		end
 	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
 		-- no route or occupied
 		newSignalState = STATE_STOP
-		gShuntLink = 0
-		gYardEntry[gConnectedLink] = false
-		newShuntState = SHUNTSTATE_STOP
+		newAnimState = ANIMSTATE_STOP
+		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- Unprotected yard.
+			gShuntLink = 1
+			gYardEntry[gConnectedLink] = true
+			newShuntState = SHUNTSTATE_UNPROTECTED		
+		else
+			gShuntLink = 0
+			gYardEntry[gConnectedLink] = false
+			newShuntState = SHUNTSTATE_STOP
+		end
 	elseif gConnectedLink > 0 then
 		if gLinkState[gConnectedLink] == STATE_BLOCKED then
 			-- exit signal facing an occupied block
 			newSignalState = STATE_STOP	
-			gShuntLink = 0
+			newAnimState = ANIMSTATE_STOP
+			if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- Unprotected yard.
+				gShuntLink = 1
+				gYardEntry[gConnectedLink] = true
+				newShuntState = SHUNTSTATE_UNPROTECTED		
+			else
+				gShuntLink = 0
+				gYardEntry[gConnectedLink] = false
+				newShuntState = SHUNTSTATE_STOP
+			end
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
+			-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
 			gYardEntry[gConnectedLink] = false
-			newShuntState = SHUNTSTATE_STOP
+			gShuntLink = 0
+			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+				if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+					-- diverging route, signal slow
+					newSignalState = STATE_SLOW
+					newAnimState = ANIMSTATE_SLOW
+				else
+					newSignalState = STATE_GO
+					newAnimState = ANIMSTATE_GO
+				end
+				newShuntState = SHUNTSTATE_GO
+			else
+				newSignalState = STATE_STOP
+				newAnimState = ANIMSTATE_STOP
+				newShuntState = SHUNTSTATE_STOP
+			end		
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
+		-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
+			if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
+				-- Check if next signal is at stop, show a slow signal if that is the case.
+				if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+					newSignalState = STATE_GO
+					newAnimState = ANIMSTATE_GO
+				else
+					newSignalState = STATE_SLOW
+					newAnimState = ANIMSTATE_SLOWER
+				end
+				newShuntState = SHUNTSTATE_GO
+			elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- diverging route, signal slow
+				newSignalState = STATE_SLOW
+				newAnimState = ANIMSTATE_SLOWER	
+				newShuntState = SHUNTSTATE_GO				
+			end
+		elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
+			-- Check if next signal is at stop, show a slow signal if that is the case.
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
+			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+				newSignalState = STATE_GO
+				newAnimState = ANIMSTATE_GO
+			else
+				newSignalState = STATE_SLOW
+				newAnimState = ANIMSTATE_SLOW
+			end
+			newShuntState = SHUNTSTATE_GO
+		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+			-- diverging route, signal slow
+			gYardEntry[gConnectedLink] = false
+			gShuntLink = 0
+			newSignalState = STATE_SLOW
+			newAnimState = ANIMSTATE_SLOW
+			newShuntState = SHUNTSTATE_GO
+		elseif Call("GetLinkFeatherChar", gConnectedLink) == 50 then
+			-- Check if the Character field for this link is set to "2". if so, Shunt-only route. Only use shunt signal.
+			newSignalState = STATE_STOP
+			newAnimState = ANIMSTATE_STOP
+			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
+				-- Unprotected yard.
+				gShuntLink = 1
+				gYardEntry[gConnectedLink] = true
+				newShuntState = SHUNTSTATE_UNPROTECTED		
+			else
+				gShuntLink = 0
+				gYardEntry[gConnectedLink] = false
+				newShuntState = SHUNTSTATE_GO		
+			end
 		end
 	end
 
@@ -549,9 +630,20 @@ function SetSignalState()
 		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
 		gAnimState = newAnimState
 		SetLights()
-		Call( "Set2DMapProSignalState", newAnimState )
+		if gHomeSignal then
+			if gSignalState >= STATE_STOP then
+				Call( "Set2DMapSignalState", STATE_STOP)
+			else
+				Call( "Set2DMapSignalState", gSignalState)
+			end
+			if gSignalState == STATE_BLOCKED and not gBlockSignal then
+				Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
+			else
+				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			end
+		end
 	end
-	
+		
 --	if newExpectState ~= gExpectState then
 --		DebugPrint("SetSignalState() - signal aspect changed from " .. newExpectState .. " to " .. gExpectState .. " - change lights" )
 --		newExpectState = gExpectState		gShuntState == SHUNTSTATE_GO
