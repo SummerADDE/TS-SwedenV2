@@ -99,7 +99,7 @@
 				<cEntityContainerBlueprint>
 					<Children>
 						<cEntityContainerBlueprint-sChild d:id="30427168">
-							<ChildName d:type="cDeltaString">SE S1 Buffer Lights</ChildName>
+							<ChildName d:type="cDeltaString">SE S1</ChildName>
 							<BlueprintID>
 								<iBlueprintLibrary-cAbsoluteBlueprintID>
 									<BlueprintSetID>
