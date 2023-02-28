@@ -297,7 +297,7 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 	if (parameter ~= "DoNotForward") then
 		if gDissabled[linkIndex] or not gHomeSignal then	-- just forward it on
 			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
-		elseif gShuntSignal and gSignalState == STATE_GO then -- Shunt signal shows clear aspect. But there might be a signal ahead showing something different that should be forwarded on instead.
+		elseif gShuntSignal then -- Shunt signal shows clear aspect. But there might be a signal ahead showing something different that should be forwarded on instead.
 			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
 		elseif (linkIndex > 0) then
 			-- We've received a PASS message, so forward it on
