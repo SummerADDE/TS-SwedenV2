@@ -2,13 +2,16 @@
 -- INITIALISE
 -- Signal specific initialise function
 function Initialise()
+	DebugPrint("Initialise() – SE H5 Block signal")
 	-- If we're a signal head, we don't need to know our own name to switch our lights on and off
 	if (SIGNAL_HEAD_NAME == nil) then
 		SIGNAL_HEAD_NAME = ""
 	end
 	-- Add support for custom text & numbers to child objects.
-	local number = Call ("GetId")
-	Call ("Post:SetText", number, 0)
+	local number = Call("GetId")
+	if type(number) == "string" or type(number) == "number" then
+		Call("Post:SetText", number, 0)
+	end
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
 	SIGNAL_HEAD_NAME 		= "SE H5:"
 	-- Set our light node names
@@ -19,12 +22,14 @@ function Initialise()
 	LIGHT_NODE_WHITE		= "W1"
 	LIGHT_NODE_GREEN3		= "G3"
 
--- Initialise global variables
-gHomeSignal 	= true
-gDistanceSignal = true
-gBlockSignal	= false				 	-- is this an intermediate block signal?
-gShuntSignal	= false					-- is this a dwarf signal or not?
+	-- Initialise global variables
+	gHomeSignal 	= true
+	gDistanceSignal = true
+	gBlockSignal	= false				 	-- is this an intermediate block signal?
+	gShuntSignal	= false					-- is this a dwarf signal or not?
+	
 	BaseInitialise()
+	DebugStatus()
 end
 
 --------------------------------------------------------------------------------------
@@ -92,19 +97,25 @@ require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/SE V2 Commo
 function SetSignalState()
 	local newSignalState = STATE_GO
 	local newAnimState = ANIMSTATE_GO
-	if (gCallOn == 1) then
-		gYardEntry[gConnectedLink] = false
+
+	-- Check if gConnectedLink is safe to use
+	local safeLink = type(gConnectedLink) == "number" and gConnectedLink >= 0
+	
+	-- Call-on mode logic
+	if gCallOn == 1 then
+		if safeLink then gYardEntry[gConnectedLink] = false end
 		gShuntLink = 0
-		if gOccupationTable[gConnectedLink] > 0 then
-			-- Train in block. Show slow.
+		if safeLink and type(gConnectedLink) == "number" and safeLink and gOccupationTable[gConnectedLink] > 0 then
 			newAnimState = ANIMSTATE_SHUNT
 			newSignalState = STATE_SHUNT
 		else
 			newAnimState = ANIMSTATE_CALLON
 			newSignalState = STATE_CALLON
 		end
+
+	-- Block signal logic
 	elseif gBlockSignal then
-		gYardEntry[gConnectedLink] = false
+		if safeLink then gYardEntry[gConnectedLink] = false end
 		gShuntLink = 0
 		if gOccupationTable[0] > 0 and gGoingForward then
 			newSignalState = STATE_STOP
@@ -113,43 +124,43 @@ function SetSignalState()
 			newSignalState = STATE_BLOCKED
 			newAnimState = ANIMSTATE_STOP
 		end
+
+	-- Backward movement into the block
 	elseif gOccupationTable[0] > 0 and not gGoingForward then
-		-- might be an entry signal with a consist going backwards into a block
-		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-			-- Unprotected yard.
+		if safeLink and Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 			gShuntLink = 1
 			gYardEntry[gConnectedLink] = true
 			newAnimState = ANIMSTATE_UNPROTECTED
-			newSignalState = STATE_UNPROTECTED		
+			newSignalState = STATE_UNPROTECTED
 		else
 			gShuntLink = 0
-			gYardEntry[gConnectedLink] = false
+			if safeLink then gYardEntry[gConnectedLink] = false end
 			newAnimState = ANIMSTATE_STOP
 			newSignalState = STATE_BLOCKED
 		end
-	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
-		-- no route or occupied
-		if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-			-- Unprotected yard.
+
+	-- No route or route occupied
+	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or (safeLink and type(gConnectedLink) == "number" and safeLink and gOccupationTable[gConnectedLink] > 0) then
+		if safeLink and Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 			gShuntLink = 1
 			gYardEntry[gConnectedLink] = true
 			newAnimState = ANIMSTATE_UNPROTECTED
-			newSignalState = STATE_UNPROTECTED		
+			newSignalState = STATE_UNPROTECTED
 		else
 			gShuntLink = 0
-			gYardEntry[gConnectedLink] = false
+			if safeLink then gYardEntry[gConnectedLink] = false end
 			newAnimState = ANIMSTATE_STOP
 			newSignalState = STATE_STOP
 		end
-	elseif gConnectedLink > 0 then
-		if gLinkState[gConnectedLink] == STATE_BLOCKED then
-			-- exit signal facing an occupied block
-			if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-				-- Unprotected yard.
+
+	-- Route is clear, evaluate aspect based on next signal
+	elseif safeLink then
+		if safeLink and gLinkState[gConnectedLink] == STATE_BLOCKED then
+			if Call("GetLinkFeatherChar", gConnectedLink) == 50 and Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 				gShuntLink = 1
 				gYardEntry[gConnectedLink] = true
 				newAnimState = ANIMSTATE_UNPROTECTED
-				newSignalState = STATE_UNPROTECTED		
+				newSignalState = STATE_UNPROTECTED
 			else
 				gShuntLink = 0
 				gYardEntry[gConnectedLink] = false
@@ -157,12 +168,10 @@ function SetSignalState()
 				newSignalState = STATE_STOP
 			end
 		elseif Call("GetLinkFeatherChar", gConnectedLink) == 49 then
-			-- Check if the Character field for this link is set to "1". if so,  Check if next signal is at stop, show a stop signal if that is the case.
 			gYardEntry[gConnectedLink] = false
 			gShuntLink = 0
-			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
-				if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-					-- diverging route, signal slow
+			if safeLink and gLinkState[gConnectedLink] == STATE_GO or safeLink and gLinkState[gConnectedLink] == STATE_SLOW then
+				if Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 					newAnimState = ANIMSTATE_SLOW
 					newSignalState = STATE_SLOW
 				else
@@ -172,71 +181,63 @@ function SetSignalState()
 			else
 				newAnimState = ANIMSTATE_STOP
 				newSignalState = STATE_STOP
-			end		
+			end
 		elseif Call("GetLinkFeatherChar", gConnectedLink) == 51 then
-		-- Check if the Character field for this link is set to "3". if so, 3 green lights should apply isntead of 2 lights.
 			gYardEntry[gConnectedLink] = false
 			gShuntLink = 0
-			if Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
-				-- Check if next signal is at stop, show a slow signal if that is the case.
-				if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+			if Call("GetLinkApproachControl", gConnectedLink) ~= 0 then
+				if safeLink and gLinkState[gConnectedLink] == STATE_GO or safeLink and gLinkState[gConnectedLink] == STATE_SLOW then
 					newSignalState = STATE_GO
 					newAnimState = ANIMSTATE_GO
 				else
 					newSignalState = STATE_SLOW
 					newAnimState = ANIMSTATE_SLOWER
 				end
-			elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-				-- diverging route, signal slow
+			elseif Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 				newSignalState = STATE_SLOW
-				newAnimState = ANIMSTATE_SLOWER			
+				newAnimState = ANIMSTATE_SLOWER
 			end
-		elseif Call ( "GetLinkApproachControl", gConnectedLink ) ~= 0 then
-			-- Check if next signal is at stop, show a slow signal if that is the case.
+		elseif Call("GetLinkApproachControl", gConnectedLink) ~= 0 then
 			gYardEntry[gConnectedLink] = false
 			gShuntLink = 0
-			if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
+			if safeLink and gLinkState[gConnectedLink] == STATE_GO or safeLink and gLinkState[gConnectedLink] == STATE_SLOW then
 				newSignalState = STATE_GO
 				newAnimState = ANIMSTATE_GO
 			else
 				newSignalState = STATE_SLOW
 				newAnimState = ANIMSTATE_SLOW
 			end
-		elseif Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-			-- diverging route, signal slow
+		elseif Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 			gYardEntry[gConnectedLink] = false
 			gShuntLink = 0
 			newSignalState = STATE_SLOW
 			newAnimState = ANIMSTATE_SLOW
 		elseif Call("GetLinkFeatherChar", gConnectedLink) == 50 then
-			-- Check if the Character field for this link is set to "2". if so, Shunt-only route. Only use shunt signal.
-			if Call ( "GetLinkLimitedToYellow", gConnectedLink ) ~= 0 then
-				-- Unprotected yard.
+			if Call("GetLinkLimitedToYellow", gConnectedLink) ~= 0 then
 				gShuntLink = 1
 				gYardEntry[gConnectedLink] = true
 				newAnimState = ANIMSTATE_UNPROTECTED
-				newSignalState = STATE_UNPROTECTED		
+				newSignalState = STATE_UNPROTECTED
 			else
 				gShuntLink = 0
 				gYardEntry[gConnectedLink] = false
 				newAnimState = ANIMSTATE_CALLON
-				newSignalState = STATE_CALLON		
+				newSignalState = STATE_CALLON
 			end
 		end
 	end
 
--- DO NOT CHANGE BELOW - Handles sending messages and setting up the correct aspects.
-
+	-- Apply signal state and update visuals
 	if newSignalState ~= gSignalState then
-		DebugPrint("SetSignalState() - signal state changed from " .. gSignalState .. " to " .. newSignalState .. " - sending message" )
+		DebugPrint("SetSignalState() - signal state changed from " .. gSignalState .. " to " .. newSignalState .. " - sending message")
 		gSignalState = newSignalState
 		if gSignalState == STATE_BLOCKED and not gBlockSignal then
-			Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
+			Call("SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0)
 		else
-			Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			Call("SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0)
 		end
 	end
-	
+
 	if newAnimState ~= gAnimState then
 		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
 		gAnimState = newAnimState
@@ -247,12 +248,8 @@ function SetSignalState()
 			else
 				Call( "Set2DMapSignalState", gSignalState)
 			end
-			if gSignalState == STATE_BLOCKED and not gBlockSignal then
-				Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
-			else
-				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
-			end
 		end
 	end
 
+	DebugStatus()
 end

@@ -6,6 +6,14 @@
 
 --include=SE CommonScript.lua
 --include=Signal CommonScript.lua
+local hasDebugging, _ = pcall(require, "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/Debugging.lua")
+if not hasDebugging then
+	-- Define dummy fallback
+	function DebugPrint() end
+	DEBUG = false
+	DEBUG_STATUS = false
+	function DebugStatus() end
+end
 
 --------------------------------------------------------------------------------------
 -- ASCII code for GetLinkFeatherChar
@@ -46,16 +54,10 @@ end
 -- SWITCH LIGHT
 -- Turns the selected light node on (1) / off (0)
 -- if the light node exists for this signal
-function SwitchLight( head, lightNode, state )
-
-	-- If no head is specified, assume that signal only has one
-	if head == nil then
-		head = SIGNAL_HEAD_NAME
-	end
-
-	-- If this light node exists for this signal
-	if lightNode ~= nil and head ~= nil then
-		Call ( head .. "ActivateNode", lightNode, state )
+function SwitchLight(head, lightNode, state)
+	if type(head) ~= "string" then head = SIGNAL_HEAD_NAME end
+	if type(head) == "string" and type(lightNode) == "string" then
+		Call(head .. "ActivateNode", lightNode, state)
 	end
 end
 
@@ -109,6 +111,11 @@ OCCUPATION_DECREMENT							= 15
 DISTANCE_INCREMENT								= 16
 DISTANCE_DECREMENT								= 17
 
+-- Check signal state for shunt signals
+OFF			= 0
+GO			= 1
+SLOW		= 2
+
 -- What you need to add to a signal message number to turn it into the equivalent PASS message
 PASS_OFFSET										= 50
 
@@ -126,10 +133,6 @@ gGoingForward	= true
 gInitialised	= false					-- has the route finished loading yet?
 gSignalState	= STATE_RESET			-- state of this block/signal
 gExpectState	= STATE_RESET			-- state of next block/signal
-gHomeSignal 	= true
-gDistanceSignal = false
-gBlockSignal	= false				 	-- is this an intermediate block signal?
-gShuntSignal	= false					-- is this a dwarf signal or not?
 gConnectedLink	= 0						-- which link is connected?
 gAnimState		= -1					-- what's the current state of our main lights?
 gShuntState		= -1					-- what's the current state of our shunt lights?
@@ -138,16 +141,8 @@ gShuntLink		= 0						-- Is this link a shunt path?
 
 -- State of flashing light
 gLightFlashOn			= 0
-gTimeSinceLastFlash	= 0
+gTimeSinceLastFlash		= 0
 
--- debugging stuff
-DEBUG = true 									-- set to true to turn debugging on
-function DebugPrint( message )
-	local gId = Call ("GetId")
-	if (DEBUG) then
-		Print( gId .. message )
-	end
-end
 
 --------------------------------------------------------------------------------------
 -- BASE INITIALISE
@@ -180,8 +175,7 @@ end
 -- INITIALISE SIGNAL
 -- Called after route is set up and all links and junctions are known
 function InitialiseSignal()
-	DebugPrint("InitialiseSignal()")
-	-- Remember that we've been initialised
+	DebugPrint("Initialising signal with gHomeSignal=" .. tostring(gHomeSignal) .. ", gBlockSignal=" .. tostring(gBlockSignal))
 	gInitialised = true
 
 	-- check for dissabled links (links placed before link 0)
@@ -194,27 +188,47 @@ function InitialiseSignal()
 			gLinkCount = gLinkCount - 1
 		end
 	end
+
 	for link = 1, gLinkCount - 1 do
-		gLinkState[gConnectedLink] = STATE_RESET
+		if type(gConnectedLink) == "number" and gConnectedLink >= 0 then
+			gLinkState[gConnectedLink] = STATE_RESET
+		end
 	end
-	
-	gBlockSignal = gHomeSignal and (gLinkCount == 1)	
-	
+
+	-- If 1 link only, Force gConnectedLink = 0
+	if gLinkCount == 1 then
+		gConnectedLink = 0
+		DebugPrint("Signal has one link – forcing gConnectedLink = 0")
+	end
+
+	-- Set gConnectedLink safely for block signals
 	if gBlockSignal then
+		local clink = Call("GetConnectedLink", "10", 1, 0)
+		if clink ~= -1 then
+			gConnectedLink = clink
+			DebugPrint("BlockSignal[" .. gLinkCount .. "] - Connected to " .. gConnectedLink)
+		else
+			DebugPrint("BlockSignal[" .. gLinkCount .. "] - No connected link")
+		end
 		SetSignalState()
-		DebugPrint("BlockSignal[" .. gLinkCount .. "]")
-		Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+		DebugPrint("SendSignalMessage: " .. tostring(SIGNAL_GO + gSignalState))
+		-- Force signal state to propagate at init
+		Call("SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0)
+
 	elseif gHomeSignal then
-		gConnectedLink = Call( "GetConnectedLink", "10", 1, 0 )
+		gConnectedLink = Call("GetConnectedLink", "10", 1, 0)
 		SetSignalState()
-		DebugPrint("HomeSignal[" .. gLinkCount .. "]")		
-		Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+		DebugPrint("HomeSignal[" .. gLinkCount .. "]")
+		Call("SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0)
 	end
+
 	if gDistanceSignal then
 		DebugPrint("DistanceSignal[" .. gLinkCount .. "]")
 	else
 		Call("EndUpdate")
 	end
+	
+	DebugStatus()
 end
 
 --------------------------------------------------------------------------------------
@@ -231,6 +245,7 @@ function OnConsistPass ( prevFrontDist, prevBackDist, frontDist, backDist, linkI
 			end
 			if ( gCallOn == 1 ) then
 				gCallOn = 0
+				DebugPrint("Train passed signal at Call-on Mode.")
 			end
 		end
 	end
@@ -282,7 +297,10 @@ end
 -- ON SIGNAL MESSAGE
 -- Handles messages from other signals
 function OnSignalMessage( message, parameter, direction, linkIndex )
---	DebugPrint("OnSignalMessage(" .. message .. ", " .. parameter .. ", " .. direction .. ", " .. linkIndex .. ")")
+	if linkIndex == nil or type(linkIndex) ~= "number" or linkIndex < 0 or linkIndex >= gLinkCount then
+		DebugPrint("Invalid or out-of-range linkIndex: " .. tostring(linkIndex))
+		return
+	end
 	-- This message is to reset the signals after a scenario / route is reset
 	if (message == RESET_SIGNAL_STATE) then
 		Initialise()
@@ -296,8 +314,6 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 	-- ignore messages that have the "DoNotForward" parameter
 	if (parameter ~= "DoNotForward") then
 		if gDissabled[linkIndex] or not gHomeSignal then	-- just forward it on
-			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
-		elseif gShuntSignal then -- Shunt signal shows clear aspect. But there might be a signal ahead showing something different that should be forwarded on instead.
 			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
 		elseif (linkIndex > 0) then
 			-- We've received a PASS message, so forward it on
@@ -316,9 +332,12 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		return	-- Do nothing
 	end
 
+	DebugPrint("OnSignalMessage precheck: type(message)=" .. tostring(type(message)) .. ", type(SIGNAL_GO)=" .. tostring(type(SIGNAL_GO)) .. ", value=" .. tostring(message))
+
+
 	-- BLOCK STATES
-	if (message >= SIGNAL_GO) and (message <= SIGNAL_BLOCKED) then
-		DebugPrint("Message: SIGNAL_STATE_CHANGE received ... gLinkState[" .. linkIndex .. "]:" .. message)
+	if type(message) == "number" and message >= SIGNAL_GO and message <= (SIGNAL_GO + STATE_CALLON) then
+	   DebugPrint("Message: SIGNAL_STATE_CHANGE received ... gLinkState[" .. linkIndex .. "]:" .. message)
 		if gBlockSignal and message == SIGNAL_STOP and parameter == "BLOCKED" then
 			-- train coming our direction in an entry signal, block occupied
 			gLinkState[0] = STATE_BLOCKED
@@ -326,10 +345,10 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		else
 			gLinkState[linkIndex] = message - SIGNAL_GO
 		end
-		if (gConnectedLink >= 0) then
+		if type(gConnectedLink) == "number" and gConnectedLink >= 0 and gLinkState[gConnectedLink] ~= nil then
 			gExpectState = gLinkState[gConnectedLink]
---		else
---			gExpectState = STATE_UNDEFINED
+		else
+			gExpectState = STATE_STOP -- fallback
 		end
 		DebugPrint("Link " .. linkIndex .. " is now " .. gLinkState[linkIndex])
 		if gHomeSignal then
@@ -382,35 +401,28 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		-- and this signal spans a junction (ie, not a block signal)
 		if linkIndex == 0 and parameter == "0" then
 			gConnectedLink = Call( "GetConnectedLink", "10", 1, 0 )
-			if gConnectedLink >= 0 then
+			if gConnectedLink >= 0 and gLinkState[gConnectedLink] ~= nil then
 				gExpectState = gLinkState[gConnectedLink]
-				DebugPrint("Expected state: " .. gExpectState)
-			elseif (gConnectedLink == 0) then
-				gExpectState = gLinkState[Link]
-				DebugPrint("Expected state: " .. gExpectState)
---			else
---				gExpectState = STATE_UNDEFINED
---				DebugPrint("Expected state: undefined")
+			else
+				gExpectState = STATE_STOP -- Fallback om inget är kopplat
 			end
-			DebugPrint("Message: JUNCTION_STATE_CHANGE received ... activate link: " .. gConnectedLink)
+			DebugPrint("Expected state after JUNCTION_STATE_CHANGE: " .. tostring(gExpectState))
 			SetSignalState()
-			-- Pass on message in case junction is protected by more than one signal
-			-- NB: this message is passed on when received on link 0 instead of link 1+
-			-- When it reaches a link > 0 or a signal with only one link, it will be consumed
-			Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
 		end
 		if ( gCallOn == 1 ) then
 			gCallOn = 0
 			SetSignalState()
 		end
 	elseif (message == REQUEST_TO_SPAD) then
-		-- Train request to pass a red signal.
+		DebugPrint("REQUEST_TO_SPAD received.")
+
 		if gHomeSignal then
 			gCallOn = 1
 			SetSignalState()
-		else
-			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
-			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
+			DebugPrint("REQUEST_TO_SPAD sent to signal. Changing its aspects.")
+		elseif gDistanceSignal and gConnectedLink ~= nil and gConnectedLink >= 0 then
+			DebugPrint("REQUEST_TO_SPAD sent on distant signal – Forwarding.")
+			Call("SendSignalMessage", REQUEST_TO_SPAD, parameter, direction, 1, gConnectedLink)
 		end
 	end
 end

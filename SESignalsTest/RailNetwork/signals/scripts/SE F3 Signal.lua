@@ -2,13 +2,16 @@
 -- INITIALISE
 -- Signal specific initialise function
 function Initialise()
+	DebugPrint("Initialise() – SE F3 Distant signal")
 	-- If we're a signal head, we don't need to know our own name to switch our lights on and off
 	if (SIGNAL_HEAD_NAME == nil) then
 		SIGNAL_HEAD_NAME = ""
 	end
 	-- Add support for custom text & numbers to child objects.
-	local number = Call ("GetId")
-	Call ("Post:SetText", number, 0)
+	local number = Call("GetId")
+	if type(number) == "string" or type(number) == "number" then
+		Call("Post:SetText", number, 0)
+	end
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
 	SIGNAL_HEAD_NAME 		= "SE F3:"
 	-- Set our light node names
@@ -16,9 +19,15 @@ function Initialise()
 	LIGHT_NODE_GREEN2		= "G1"
 	LIGHT_NODE_WHITE		= "W1"
 	LIGHT_NODE_GREEN3		= "G2"
-	gHomeSignal = false
+
+	-- Initialise global variables
+	gHomeSignal 	= false
 	gDistanceSignal = true
+	gBlockSignal	= false				 	-- is this an intermediate block signal?
+	gShuntSignal	= false					-- is this a dwarf signal or not?
+	
 	BaseInitialise()
+	DebugStatus()
 end
 
 --------------------------------------------------------------------------------------
