@@ -2,30 +2,25 @@
 -- INITIALISE
 -- Signal specific initialise function
 function Initialise()
-	DebugPrint("Initialise() – SE S1 End signal")
 	-- If we're a signal head, we don't need to know our own name to switch our lights on and off
 	if (SIGNAL_HEAD_NAME == nil) then
 		SIGNAL_HEAD_NAME = ""
 	end
 	-- Add support for custom text & numbers to child objects.
-	local number = Call("GetId")
-	if type(number) == "string" or type(number) == "number" then
-		Call("Post:SetText", number, 0)
-	end
+	local number = Call ("GetId")
+	Call ("Post:SetText", number, 0)
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
 	SIGNAL_HEAD_NAME 		= "SE S1:"
 	-- Set our light node names
 	-- Main
 	LIGHT_NODE_RED			= "R1"
 
-	-- Initialise global variables
-	gHomeSignal 	= true
-	gDistanceSignal = false
-	gBlockSignal	= false				 	-- is this an intermediate block signal?
-	gShuntSignal	= false					-- is this a dwarf signal or not?
-	
+-- Initialise global variables
+gHomeSignal 	= true
+gDistanceSignal = false
+gBlockSignal	= false				 	-- is this an intermediate block signal?
+gShuntSignal	= false					-- is this a dwarf signal or not?
 	BaseInitialise()
-	DebugStatus()
 end
 
 --------------------------------------------------------------------------------------
@@ -52,7 +47,7 @@ function SetSignalState()
 	local newSignalState = STATE_STOP
 	local newAnimState = ANIMSTATE_STOP
 
--- Below: Message dispatch & animation trigger. Do not modify unless protocol changes.
+-- DO NOT CHANGE BELOW - Handles sending messages and setting up the correct aspects.
 
 	if newSignalState ~= gSignalState then
 		DebugPrint("SetSignalState() - signal state changed from " .. gSignalState .. " to " .. newSignalState .. " - sending message" )
@@ -74,8 +69,12 @@ function SetSignalState()
 			else
 				Call( "Set2DMapSignalState", gSignalState)
 			end
+			if gSignalState == STATE_BLOCKED and not gBlockSignal then
+				Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
+			else
+				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			end
 		end
 	end
 
-	DebugStatus()
 end

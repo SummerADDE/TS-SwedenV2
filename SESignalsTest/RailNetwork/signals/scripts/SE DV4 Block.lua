@@ -2,16 +2,13 @@
 -- INITIALISE
 -- Signal specific initialise function
 function Initialise()
-	DebugPrint("Initialise() – SE DV4 Blockshunt signal")
 	-- If we're a signal head, we don't need to know our own name to switch our lights on and off
 	if (SIGNAL_SHUNT_NAME == nil) then
 		SIGNAL_SHUNT_NAME = ""
 	end
 	-- Add support for custom text & numbers to child objects.
-	local number = Call("GetId")
-	if type(number) == "string" or type(number) == "number" then
-		Call("Post:SetText", number, 0)
-	end
+	local number = Call ("GetId")
+	Call ("Post:SetText", number, 0)
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
 	SIGNAL_SHUNT_NAME 		= "SE DV4:"
 	-- Set our light node names
@@ -21,14 +18,12 @@ function Initialise()
 	LIGHT_NODE_WHITE3		= "W3"
 	LIGHT_NODE_WHITE4		= "W4"
 
-	-- Initialise global variables
-	gHomeSignal 	= true
-	gDistanceSignal = false
-	gBlockSignal	= true				 	-- is this an intermediate block signal?
-	gShuntSignal	= true					-- is this a dwarf signal or not?
-	
+-- Initialise global variables
+gHomeSignal 	= true
+gDistanceSignal = false
+gBlockSignal	= true				 	-- is this an intermediate block signal?
+gShuntSignal	= true					-- is this a dwarf signal or not?
 	BaseInitialise()
-	DebugStatus()
 end
 
 --------------------------------------------------------------------------------------
@@ -74,15 +69,10 @@ require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/SE V2 Commo
 function SetSignalState()
 	local newSignalState = STATE_GO
 	local newAnimState = ANIMSTATE_GO
-
-	-- Check if gConnectedLink is safe to use
-	local safeLink = type(gConnectedLink) == "number" and gConnectedLink >= 0
-	
-	-- Call-on mode logic
-	if gCallOn == 1 then
+	if (gCallOn == 1) then
 		gYardEntry[gConnectedLink] = false
 		gShuntLink = 0
-		if type(gConnectedLink) == "number" and safeLink and gOccupationTable[gConnectedLink] > 0 then
+		if gOccupationTable[gConnectedLink] > 0 then
 			-- Train in block. Show slow.
 			newAnimState = ANIMSTATE_SHUNT
 			newSignalState = STATE_SHUNT
@@ -106,14 +96,14 @@ function SetSignalState()
 			gYardEntry[gConnectedLink] = false
 			newAnimState = ANIMSTATE_STOP
 			newSignalState = STATE_BLOCKED
-	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or (type(gConnectedLink) == "number" and type(gConnectedLink) == "number" and safeLink and gOccupationTable[gConnectedLink] > 0) then
+	elseif gConnectedLink == -1 or gOccupationTable[0] > 0 or gOccupationTable[gConnectedLink] > 0 then
 			gShuntLink = 0
 			gYardEntry[gConnectedLink] = false
 			newAnimState = ANIMSTATE_STOP
 			newSignalState = STATE_STOP
 	end
 
--- Below: Message dispatch & animation trigger. Do not modify unless protocol changes.
+-- DO NOT CHANGE BELOW - Handles sending messages and setting up the correct aspects.
 
 	if newSignalState ~= gSignalState then
 		DebugPrint("SetSignalState() - signal state changed from " .. gSignalState .. " to " .. newSignalState .. " - sending message" )
@@ -129,7 +119,13 @@ function SetSignalState()
 		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
 		gAnimState = newAnimState
 		SetLights()
+		if gHomeSignal then
+			if gSignalState == STATE_BLOCKED and not gBlockSignal then
+				Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
+			else
+				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
+			end
+		end
 	end
 
-	DebugStatus()
 end
