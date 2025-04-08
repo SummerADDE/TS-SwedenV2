@@ -64,6 +64,15 @@ end
 require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/SE V2 CommonScript.lua"
 
 --------------------------------------------------------------------------------------
+-- GET SIGNAL STATE
+-- Gets the current state of the signal - blocked, warning or clear. 
+-- The state info is used for TAB Funcionality.
+-- Only to be used on main signals.
+function GetSignalState()
+	return gSignalState
+end
+
+--------------------------------------------------------------------------------------
 -- SET SIGNAL STATE
 -- Figures out what state to show and messages to send
 function SetSignalState()

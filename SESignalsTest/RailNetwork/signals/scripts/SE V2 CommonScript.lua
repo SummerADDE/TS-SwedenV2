@@ -338,23 +338,14 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 	elseif (message == REQUEST_TO_SPAD) then
 		-- Train request to pass a red signal.
 		DebugPrint("Message: REQUEST_TO_SPAD received.")
-		if gHomeSignal then
-			gCallOn = 1
-			SetSignalState()
-		else
-			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
-			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
-		end
+		gCallOn = 1
+		SetSignalState()
 
 	elseif not gHomeSignal then
-		if (message == REQUEST_TO_SPAD) then
-			-- Train request to pass a red signal.
-			DebugPrint("Message: REQUEST_TO_SPAD received.")
-			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
-			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
-		end
-		return	-- do no more if we are distance signal only
-
+	if ( parameter ~= "DoNotForward" ) then
+		Call( "SendSignalMessage", message, parameter, -direction, 1, linkIndex )
+	end
+		DebugPrint("gConnectedLink (via InitialiseSignal) = " .. tostring(gConnectedLink))
 	-- INITIALISATION MESSAGES
 	-- There's a train on the line ahead of us when the route first loads
 	elseif (message == INITIALISE_SIGNAL_TO_BLOCKED) then
@@ -447,13 +438,4 @@ function Update( time )
 			gTimeSinceLastFlash = 0
 		end
 	end
-end
-
---------------------------------------------------------------------------------------
--- GET SIGNAL STATE
--- Gets the current state of the signal - blocked, warning or clear. 
--- The state info is used for TAB Funcionality.
---
-function GetSignalState()
-	return gSignalState
 end
