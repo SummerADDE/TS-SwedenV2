@@ -177,13 +177,6 @@ function SetSignalState()
 		DebugPrint("SetSignalState() - signal aspect changed from " .. gAnimState .. " to " .. newAnimState .. " - change lights" )
 		gAnimState = newAnimState
 		SetLights()
-		if gHomeSignal then
-			if gSignalState == STATE_BLOCKED and not gBlockSignal then
-				Call( "SendSignalMessage", SIGNAL_STOP, "BLOCKED", -1, 1, 0 )
-			else
-				Call( "SendSignalMessage", SIGNAL_GO + gSignalState, "", -1, 1, 0 )
-			end
-		end
 	end
 
 end

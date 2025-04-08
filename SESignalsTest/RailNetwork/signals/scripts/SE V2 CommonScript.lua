@@ -100,14 +100,19 @@ INITIALISE_TO_PREPARED						= 3
 REQUEST_TO_SPAD								= 4
 
 -- Locally defined signal mesages
-SIGNAL_GO										= 10
-SIGNAL_SLOW										= 11
-SIGNAL_STOP										= 12
-SIGNAL_BLOCKED									= 13
 OCCUPATION_INCREMENT							= 14
 OCCUPATION_DECREMENT							= 15
 DISTANCE_INCREMENT								= 16
 DISTANCE_DECREMENT								= 17
+
+SIGNAL_GO           = 20
+SIGNAL_SLOW         = 21
+SIGNAL_STOP         = 22
+SIGNAL_BLOCKED      = 23
+SIGNAL_SHUNT        = 24
+SIGNAL_UNPROTECTED  = 25
+SIGNAL_CALLON       = 26
+
 
 -- What you need to add to a signal message number to turn it into the equivalent PASS message
 PASS_OFFSET										= 50
@@ -141,13 +146,7 @@ gLightFlashOn			= 0
 gTimeSinceLastFlash	= 0
 
 -- debugging stuff
-DEBUG = true 									-- set to true to turn debugging on
-function DebugPrint( message )
-	local gId = Call ("GetId")
-	if (DEBUG) then
-		Print( gId .. message )
-	end
-end
+require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/Debugging.lua"
 
 --------------------------------------------------------------------------------------
 -- BASE INITIALISE
@@ -282,7 +281,7 @@ end
 -- ON SIGNAL MESSAGE
 -- Handles messages from other signals
 function OnSignalMessage( message, parameter, direction, linkIndex )
---	DebugPrint("OnSignalMessage(" .. message .. ", " .. parameter .. ", " .. direction .. ", " .. linkIndex .. ")")
+	DebugPrint("OnSignalMessage(" .. message .. ", " .. parameter .. ", " .. direction .. ", " .. linkIndex .. ")")
 	-- This message is to reset the signals after a scenario / route is reset
 	if (message == RESET_SIGNAL_STATE) then
 		Initialise()
@@ -317,7 +316,7 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 	end
 
 	-- BLOCK STATES
-	if (message >= SIGNAL_GO) and (message <= SIGNAL_BLOCKED) then
+	if (message >= SIGNAL_GO) and (message <= SIGNAL_CALLON) then
 		DebugPrint("Message: SIGNAL_STATE_CHANGE received ... gLinkState[" .. linkIndex .. "]:" .. message)
 		if gBlockSignal and message == SIGNAL_STOP and parameter == "BLOCKED" then
 			-- train coming our direction in an entry signal, block occupied
@@ -336,7 +335,24 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 			SetSignalState()
 		end
 
+	elseif (message == REQUEST_TO_SPAD) then
+		-- Train request to pass a red signal.
+		DebugPrint("Message: REQUEST_TO_SPAD received.")
+		if gHomeSignal then
+			gCallOn = 1
+			SetSignalState()
+		else
+			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
+			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
+		end
+
 	elseif not gHomeSignal then
+		if (message == REQUEST_TO_SPAD) then
+			-- Train request to pass a red signal.
+			DebugPrint("Message: REQUEST_TO_SPAD received.")
+			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
+			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
+		end
 		return	-- do no more if we are distance signal only
 
 	-- INITIALISATION MESSAGES
@@ -402,15 +418,6 @@ function OnSignalMessage( message, parameter, direction, linkIndex )
 		if ( gCallOn == 1 ) then
 			gCallOn = 0
 			SetSignalState()
-		end
-	elseif (message == REQUEST_TO_SPAD) then
-		-- Train request to pass a red signal.
-		if gHomeSignal then
-			gCallOn = 1
-			SetSignalState()
-		else
-			-- Distant signal or shunt connected to a main signal. Pass the message onwards.
-			Call( "SendSignalMessage", message + PASS_OFFSET, parameter, direction, 1, linkIndex )
 		end
 	end
 end

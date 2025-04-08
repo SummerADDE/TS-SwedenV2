@@ -28,7 +28,7 @@ end
 -- Animate Swedish distance signals
 -- switch on/off the appropriate lights
 function DefaultAnimate()
-	DebugPrint("SetLights()")
+--	DebugPrint("SetLights()")
 	if (gAnimState == ANIMSTATE_GO) then
 		if gExpectState == STATE_GO or gExpectState == STATE_SLOW  then -- Kör40, Vänta Kör40
 		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
