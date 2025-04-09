@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
+	<Blueprint>
+		<cSignalBlueprint>
+			<Name d:type="cDeltaString">SE SignalV2 H4t 3L SB</Name>
+			<BrowseInformation>
+				<iBrowseableBlueprint-cBrowseInformation>
+					<DisplayName>
+						<Localisation-cUserLocalisedString>
+							<English d:type="cDeltaString">SE SignalV2 H4t 3L SB</English>
+							<French d:type="cDeltaString">SE SignalV2 H4t 3L SB</French>
+							<Italian d:type="cDeltaString">SE SignalV2 H4t 3L SB</Italian>
+							<German d:type="cDeltaString">SE SignalV2 H4t 3L SB</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 H4t 3L SB</Spanish>
+							<Dutch d:type="cDeltaString"></Dutch>
+							<Polish d:type="cDeltaString"></Polish>
+							<Russian d:type="cDeltaString"></Russian>
+							<Other/>
+							<Key d:type="cDeltaString"></Key>
+						</Localisation-cUserLocalisedString>
+					</DisplayName>
+					<Description>
+						<Localisation-cUserLocalisedString>
+							<English d:type="cDeltaString"></English>
+							<French d:type="cDeltaString"></French>
+							<Italian d:type="cDeltaString"></Italian>
+							<German d:type="cDeltaString"></German>
+							<Spanish d:type="cDeltaString"></Spanish>
+							<Dutch d:type="cDeltaString"></Dutch>
+							<Polish d:type="cDeltaString"></Polish>
+							<Russian d:type="cDeltaString"></Russian>
+							<Other/>
+							<Key d:type="cDeltaString"></Key>
+						</Localisation-cUserLocalisedString>
+					</Description>
+					<Category d:type="cDeltaString">eTrackInfrastructure</Category>
+					<ValidInScenarios d:type="cDeltaString">eFalse</ValidInScenarios>
+				</iBrowseableBlueprint-cBrowseInformation>
+			</BrowseInformation>
+			<_posori>
+				<cPosOriBlueprint/>
+			</_posori>
+			<_object>
+				<cSceneryRenderBlueprint>
+					<PrimaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString">KMW</Provider>
+									<Product d:type="cDeltaString">Sweden</Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</PrimaryNamedTextureSet>
+					<SecondaryNamedTextureSet>
+						<iBlueprintLibrary-cAbsoluteBlueprintID>
+							<BlueprintSetID>
+								<iBlueprintLibrary-cBlueprintSetID>
+									<Provider d:type="cDeltaString">KMW</Provider>
+									<Product d:type="cDeltaString">Sweden</Product>
+								</iBlueprintLibrary-cBlueprintSetID>
+							</BlueprintSetID>
+							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
+						</iBlueprintLibrary-cAbsoluteBlueprintID>
+					</SecondaryNamedTextureSet>
+					<GeometryID d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\signs\[00]sign-brg-xxxx</GeometryID>
+					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
+					<Pickable d:type="cDeltaString">eTrue</Pickable>
+					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
+					<ShadowType d:type="cDeltaString">eShadowType_None</ShadowType>
+					<ViewType d:type="cDeltaString">ExternalView</ViewType>
+					<HeatHaze/>
+					<TexText/>
+					<ProjectedLightElement/>
+					<Instancable d:type="bool">0</Instancable>
+					<DetailLevelGenerationRange>
+						<cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+							<HighestLevel_1isHighest d:type="sInt32">10</HighestLevel_1isHighest>
+							<LowestLevel_10isLowest d:type="sInt32">10</LowestLevel_10isLowest>
+						</cSceneryRenderBlueprint-sDetailLevelGenerationRange>
+					</DetailLevelGenerationRange>
+				</cSceneryRenderBlueprint>
+			</_object>
+			<_signal>
+				<cSignalComponentBlueprint>
+					<NumberOfTrackLinks d:type="sUInt32">4</NumberOfTrackLinks>
+					<Stopping d:type="cDeltaString">eTrue</Stopping>
+					<JunctionSignalType d:type="cDeltaString">eJunctionTypeNone</JunctionSignalType>
+					<ControlMode d:type="cDeltaString">eControlModeControlled</ControlMode>
+				</cSignalComponentBlueprint>
+			</_signal>
+			<_script>
+				<cScriptComponentBlueprint>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE H4 Signal</Name>
+				</cScriptComponentBlueprint>
+			</_script>
+			<_container>
+				<cEntityContainerBlueprint>
+					<Children>
+						<cEntityContainerBlueprint-sChild d:id="30427168">
+							<ChildName d:type="cDeltaString">SE H4</ChildName>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">SummerADDE</Provider>
+											<Product d:type="cDeltaString">SESignalsTest</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE H4t.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<Matrix>
+								<cHcRMatrix4x4>
+									<Element>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+									</Element>
+								</cHcRMatrix4x4>
+							</Matrix>
+						</cEntityContainerBlueprint-sChild>
+					</Children>
+					<Children>
+						<cEntityContainerBlueprint-sChild d:id="30427168">
+							<ChildName d:type="cDeltaString">SP</ChildName>
+							<BlueprintID>
+								<iBlueprintLibrary-cAbsoluteBlueprintID>
+									<BlueprintSetID>
+										<iBlueprintLibrary-cBlueprintSetID>
+											<Provider d:type="cDeltaString">SummerADDE</Provider>
+											<Product d:type="cDeltaString">SESignalsTest</Product>
+										</iBlueprintLibrary-cBlueprintSetID>
+									</BlueprintSetID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SB.xml</BlueprintID>
+								</iBlueprintLibrary-cAbsoluteBlueprintID>
+							</BlueprintID>
+							<Matrix>
+								<cHcRMatrix4x4>
+									<Element>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="00000040E17AB43F" d:precision="string">0.08</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+									</Element>
+								</cHcRMatrix4x4>
+							</Matrix>
+							<ParentNodeName d:type="cDeltaString"></ParentNodeName>
+						</cEntityContainerBlueprint-sChild>
+					</Children>
+				</cEntityContainerBlueprint>
+			</_container>
+		</cSignalBlueprint>
+	</Blueprint>
+</cBlueprintLoader>
