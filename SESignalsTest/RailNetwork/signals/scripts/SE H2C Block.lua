@@ -10,7 +10,7 @@ function Initialise()
 	local number = Call ("GetId")
 	Call ("Post:SetText", number, 0)
 	-- This is a post signal, so need reference to the attached signal head to switch lights on and off
-	SIGNAL_HEAD_NAME 		= "SE H2:"
+	SIGNAL_HEAD_NAME 		= "SE H2C:"
 	-- Set our light node names
 	-- Main
 	LIGHT_NODE_GREEN		= "G1"
@@ -18,7 +18,7 @@ function Initialise()
 
 -- Initialise global variables
 gHomeSignal 	= true
-gDistanceSignal = false
+gDistanceSignal = true
 gBlockSignal	= true				 	-- is this an intermediate block signal?
 gShuntSignal	= false					-- is this a dwarf signal or not?
 	BaseInitialise()
@@ -28,22 +28,26 @@ end
 -- Animate Swedish distance signals
 -- switch on/off the appropriate lights
 function DefaultAnimate()
-
+--	DebugPrint("SetLights()")
+	if (gAnimState == ANIMSTATE_GO) then
+		if gExpectState == STATE_GO or gExpectState == STATE_SLOW  then -- Kör40, Vänta Kör40
+			SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
+			SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
+		else --Kör40, Vänta stopp
+			SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	gLightFlashOn )
+			SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )	
+		end
+	else	-- stop or blocked
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	0 )
+		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		1 )
+	end
 end
 
 --------------------------------------------------------------------------------------
 -- Swedish home signals SetLights
 -- Switch the appropriate lights on and off based on our new state
 function DefaultSetLights()
---	DebugPrint("DefaultSetLights()")
-	if (gAnimState == ANIMSTATE_GO) then
-		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	1 )
-		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		0 )
 
-	else	-- stop or blocked
-		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_GREEN,	0 )
-		SwitchLight( SIGNAL_HEAD_NAME, LIGHT_NODE_RED,		1 )
-	end
 end
 
 
