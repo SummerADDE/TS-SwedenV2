@@ -58,6 +58,9 @@ function SetSignalState()
 	if gLinkState[gConnectedLink] == STATE_GO or gLinkState[gConnectedLink] == STATE_SLOW then
 		newAnimState = ANIMSTATE_GO
 		newSignalState = STATE_GO
+	elseif gLinkState[gConnectedLink] == STATE_CALLON or gLinkState[gConnectedLink] == STATE_SHUNT then
+		newAnimState = ANIMSTATE_GO
+		newSignalState = STATE_CALLON
 	else
 		newAnimState = ANIMSTATE_STOP
 		newSignalState = STATE_STOP

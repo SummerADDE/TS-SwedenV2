@@ -146,7 +146,14 @@ gLightFlashOn			= 0
 gTimeSinceLastFlash	= 0
 
 -- debugging stuff
-require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/Debugging.lua"
+local success, result = pcall(function()
+	require "Assets/SummerADDE/SESignalsTest/RailNetwork/signals/scripts/Debugging"
+end)
+
+if not success then
+	function DebugPrint(msg) end
+	function DebugStatus() end
+end
 
 --------------------------------------------------------------------------------------
 -- BASE INITIALISE

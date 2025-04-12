@@ -116,7 +116,7 @@ function SetSignalState()
 			gYardEntry[gConnectedLink] = false
 			newAnimState = ANIMSTATE_STOP
 			newSignalState = STATE_STOP
-	elseif not gLinkState[gConnectedLink] == STATE_GO then
+	elseif gLinkState[gConnectedLink] ~= STATE_GO then
 		-- Check if next signal is at stop, show a slow signal if that is the case.
 			newSignalState = STATE_SLOW
 			newAnimState = ANIMSTATE_SLOW
