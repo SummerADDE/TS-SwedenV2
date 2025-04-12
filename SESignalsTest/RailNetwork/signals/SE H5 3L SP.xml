@@ -64,7 +64,7 @@
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					<GeometryID d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\signs\[00]sign-brg-xxxx</GeometryID>
+					SummerADDE\SESignalsTest\RailNetwork\signals\signs
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
