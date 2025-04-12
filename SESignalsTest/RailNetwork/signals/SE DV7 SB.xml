@@ -2,16 +2,16 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE SignalV2 DV7 SB</Name>
+			<Name d:type="cDeltaString">SE SignalV2 DV7 Block SB</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 DV7 SB</English>
-							<French d:type="cDeltaString">SE SignalV2 DV7 SB</French>
-							<Italian d:type="cDeltaString">SE SignalV2 DV7 SB</Italian>
-							<German d:type="cDeltaString">SE SignalV2 DV7 SB</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 DV7 SB</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 DV7 Block SB</English>
+							<French d:type="cDeltaString">SE SignalV2 DV7 Block SB</French>
+							<Italian d:type="cDeltaString">SE SignalV2 DV7 Block SB</Italian>
+							<German d:type="cDeltaString">SE SignalV2 DV7 Block SB</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 DV7 Block SB</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -64,7 +64,7 @@
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					<GeometryID d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\signs\[00]sign-brg-xxxx</GeometryID>
+					SummerADDE\SESignalsTest\RailNetwork\signals\signs
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
@@ -92,7 +92,7 @@
 			</_signal>
 			<_script>
 				<cScriptComponentBlueprint>
-					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 Signal</Name>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 Block</Name>
 				</cScriptComponentBlueprint>
 			</_script>
 			<_container>

@@ -2,16 +2,16 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE SignalV2 DV7 D</Name>
+			<Name d:type="cDeltaString">SE SignalV2 DV7 Block SP</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 DV7 D</English>
-							<French d:type="cDeltaString">SE SignalV2 DV7 D</French>
-							<Italian d:type="cDeltaString">SE SignalV2 DV7 D</Italian>
-							<German d:type="cDeltaString">SE SignalV2 DV7 D</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 DV7 D</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 DV7 Block D</English>
+							<French d:type="cDeltaString">SE SignalV2 DV7 Block D</French>
+							<Italian d:type="cDeltaString">SE SignalV2 DV7 Block D</Italian>
+							<German d:type="cDeltaString">SE SignalV2 DV7 Block D</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 DV7 Block D</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -92,7 +92,7 @@
 			</_signal>
 			<_script>
 				<cScriptComponentBlueprint>
-					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 Signal</Name>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 Block</Name>
 				</cScriptComponentBlueprint>
 			</_script>
 			<_container>

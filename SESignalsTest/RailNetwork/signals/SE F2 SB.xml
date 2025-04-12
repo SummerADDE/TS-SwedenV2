@@ -46,8 +46,8 @@
 						<iBlueprintLibrary-cAbsoluteBlueprintID>
 							<BlueprintSetID>
 								<iBlueprintLibrary-cBlueprintSetID>
-									<Provider d:type="cDeltaString">KMW</Provider>
-									<Product d:type="cDeltaString">Sweden</Product>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
 								</iBlueprintLibrary-cBlueprintSetID>
 							</BlueprintSetID>
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
@@ -57,14 +57,14 @@
 						<iBlueprintLibrary-cAbsoluteBlueprintID>
 							<BlueprintSetID>
 								<iBlueprintLibrary-cBlueprintSetID>
-									<Provider d:type="cDeltaString">KMW</Provider>
-									<Product d:type="cDeltaString">Sweden</Product>
+									<Provider d:type="cDeltaString"></Provider>
+									<Product d:type="cDeltaString"></Product>
 								</iBlueprintLibrary-cBlueprintSetID>
 							</BlueprintSetID>
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					<GeometryID d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\signs\[00]sign-brg-xxxx</GeometryID>
+					SummerADDE\SESignalsTest\RailNetwork\signals\signs
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
@@ -85,7 +85,7 @@
 			<_signal>
 				<cSignalComponentBlueprint>
 					<NumberOfTrackLinks d:type="sUInt32">1</NumberOfTrackLinks>
-					<Stopping d:type="cDeltaString">eTrue</Stopping>
+					<Stopping d:type="cDeltaString">eFalse</Stopping>
 					<JunctionSignalType d:type="cDeltaString">eJunctionTypeNone</JunctionSignalType>
 					<ControlMode d:type="cDeltaString">eControlModeControlled</ControlMode>
 				</cSignalComponentBlueprint>
@@ -127,7 +127,7 @@
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">-0.155</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>

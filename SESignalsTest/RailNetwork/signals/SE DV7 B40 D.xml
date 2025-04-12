@@ -2,16 +2,16 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE SignalV2 DV7 1L SB</Name>
+			<Name d:type="cDeltaString">SE SignalV2 DV7 B40 SP</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 DV7 1L SB</English>
-							<French d:type="cDeltaString">SE SignalV2 DV7 1L SB</French>
-							<Italian d:type="cDeltaString">SE SignalV2 DV7 1L SB</Italian>
-							<German d:type="cDeltaString">SE SignalV2 DV7 1L SB</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 DV7 1L SB</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 DV7 B40 D</English>
+							<French d:type="cDeltaString">SE SignalV2 DV7 B40 D</French>
+							<Italian d:type="cDeltaString">SE SignalV2 DV7 B40 D</Italian>
+							<German d:type="cDeltaString">SE SignalV2 DV7 B40 D</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 DV7 B40 D</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -64,7 +64,7 @@
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					SummerADDE\SESignalsTest\RailNetwork\signals\signs
+					<GeometryID d:type="cDeltaString">newS\sweden\RailNetwork\signs\[00]sign-xxxx-small</GeometryID>
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
@@ -84,7 +84,7 @@
 			</_object>
 			<_signal>
 				<cSignalComponentBlueprint>
-					<NumberOfTrackLinks d:type="sUInt32">2</NumberOfTrackLinks>
+					<NumberOfTrackLinks d:type="sUInt32">1</NumberOfTrackLinks>
 					<Stopping d:type="cDeltaString">eTrue</Stopping>
 					<JunctionSignalType d:type="cDeltaString">eJunctionTypeNone</JunctionSignalType>
 					<ControlMode d:type="cDeltaString">eControlModeControlled</ControlMode>
@@ -92,7 +92,7 @@
 			</_signal>
 			<_script>
 				<cScriptComponentBlueprint>
-					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 Signal</Name>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV7 B40</Name>
 				</cScriptComponentBlueprint>
 			</_script>
 			<_container>
@@ -119,16 +119,16 @@
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">0.9848077</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0.1736482</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">-0.1736482</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">0.9848077</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000340" d:precision="string">2.375</e>
-										<e d:type="sFloat32" d:alt_encoding="00000040E17AB43F" d:precision="string">0.08</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">0.5</e>
+										<e d:type="sFloat32" d:alt_encoding="000000E051B8BEBF" d:precision="string">-0.12</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>
 								</cHcRMatrix4x4>
@@ -137,7 +137,7 @@
 					</Children>
 					<Children>
 						<cEntityContainerBlueprint-sChild d:id="30427168">
-							<ChildName d:type="cDeltaString">SB</ChildName>
+							<ChildName d:type="cDeltaString">SP</ChildName>
 							<BlueprintID>
 								<iBlueprintLibrary-cAbsoluteBlueprintID>
 									<BlueprintSetID>
@@ -146,27 +146,27 @@
 											<Product d:type="cDeltaString">SESignalsTest</Product>
 										</iBlueprintLibrary-cBlueprintSetID>
 									</BlueprintSetID>
-									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SB.xml</BlueprintID>
+									<BlueprintID d:type="cDeltaString">RailNetwork\signals\signalheads\SE SP.xml</BlueprintID>
 								</iBlueprintLibrary-cAbsoluteBlueprintID>
 							</BlueprintID>
 							<Matrix>
 								<cHcRMatrix4x4>
 									<Element>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000E8BF" d:precision="string">-0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000E83F" d:precision="string">0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000000000F0BF" d:precision="string">-1</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000E8BF" d:precision="string">-0.75</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="00000040E17AB43F" d:precision="string">0.08</e>
+										<e d:type="sFloat32" d:alt_encoding="000000000000E8BF" d:precision="string">-1.25</e>
+										<e d:type="sFloat32" d:alt_encoding="000000E051B8BEBF" d:precision="string">-0.12</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>
 								</cHcRMatrix4x4>

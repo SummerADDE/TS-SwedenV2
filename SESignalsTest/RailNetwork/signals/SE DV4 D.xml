@@ -92,7 +92,7 @@
 			</_signal>
 			<_script>
 				<cScriptComponentBlueprint>
-					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV4 Signal</Name>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV4 Block</Name>
 				</cScriptComponentBlueprint>
 			</_script>
 			<_container>

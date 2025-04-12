@@ -7,11 +7,11 @@
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 DV6 D</English>
-							<French d:type="cDeltaString">SE SignalV2 DV6 D</French>
-							<Italian d:type="cDeltaString">SE SignalV2 DV6 D</Italian>
-							<German d:type="cDeltaString">SE SignalV2 DV6 D</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 DV6 D</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 DV6 Block D</English>
+							<French d:type="cDeltaString">SE SignalV2 DV6 Block D</French>
+							<Italian d:type="cDeltaString">SE SignalV2 DV6 Block D</Italian>
+							<German d:type="cDeltaString">SE SignalV2 DV6 Block D</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 DV6 Block D</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -92,7 +92,7 @@
 			</_signal>
 			<_script>
 				<cScriptComponentBlueprint>
-					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV6 Signal</Name>
+					<Name d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\scripts\SE DV6 Block</Name>
 				</cScriptComponentBlueprint>
 			</_script>
 			<_container>

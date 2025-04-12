@@ -85,7 +85,7 @@
 			<_signal>
 				<cSignalComponentBlueprint>
 					<NumberOfTrackLinks d:type="sUInt32">1</NumberOfTrackLinks>
-					<Stopping d:type="cDeltaString">eTrue</Stopping>
+					<Stopping d:type="cDeltaString">eFalse</Stopping>
 					<JunctionSignalType d:type="cDeltaString">eJunctionTypeNone</JunctionSignalType>
 					<ControlMode d:type="cDeltaString">eControlModeControlled</ControlMode>
 				</cSignalComponentBlueprint>
