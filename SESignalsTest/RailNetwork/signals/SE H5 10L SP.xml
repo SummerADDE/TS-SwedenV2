@@ -2,7 +2,7 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE Signal H5 10L SP</Name>
+			<Name d:type="cDeltaString">SE SignalV2 H5 10L SP</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
@@ -64,7 +64,7 @@
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					<GeometryID d:type="cDeltaString">SummerADDE\SESignalsTest\RailNetwork\signals\signs\[00]sign-brg-xxxx</GeometryID>
+					<GeometryID d:type="cDeltaString"></GeometryID>
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
@@ -127,7 +127,7 @@
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
-										<e d:type="sFloat32" d:alt_encoding="000000C09690B33F" d:precision="string">0</e>
+										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="0000000000000000" d:precision="string">0</e>
 										<e d:type="sFloat32" d:alt_encoding="000000000000F03F" d:precision="string">1</e>
 									</Element>

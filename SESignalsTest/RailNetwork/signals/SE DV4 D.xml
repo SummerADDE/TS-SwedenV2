@@ -2,16 +2,16 @@
 <cBlueprintLoader xmlns:d="http://www.kuju.com/TnT/2003/Delta" d:version="1.0">
 	<Blueprint>
 		<cSignalBlueprint>
-			<Name d:type="cDeltaString">SE SignalV2 DV4 D</Name>
+			<Name d:type="cDeltaString">SE SignalV2 DV4 Block D</Name>
 			<BrowseInformation>
 				<iBrowseableBlueprint-cBrowseInformation>
 					<DisplayName>
 						<Localisation-cUserLocalisedString>
-							<English d:type="cDeltaString">SE SignalV2 DV4 D</English>
-							<French d:type="cDeltaString">SE SignalV2 DV4 D</French>
-							<Italian d:type="cDeltaString">SE SignalV2 DV4 D</Italian>
-							<German d:type="cDeltaString">SE SignalV2 DV4 D</German>
-							<Spanish d:type="cDeltaString">SE SignalV2 DV4 D</Spanish>
+							<English d:type="cDeltaString">SE SignalV2 DV4 Block D</English>
+							<French d:type="cDeltaString">SE SignalV2 DV4 Block D</French>
+							<Italian d:type="cDeltaString">SE SignalV2 DV4 Block D</Italian>
+							<German d:type="cDeltaString">SE SignalV2 DV4 Block D</German>
+							<Spanish d:type="cDeltaString">SE SignalV2 DV4 Block D</Spanish>
 							<Dutch d:type="cDeltaString"></Dutch>
 							<Polish d:type="cDeltaString"></Polish>
 							<Russian d:type="cDeltaString"></Russian>
@@ -64,7 +64,7 @@
 							<BlueprintID d:type="cDeltaString">System\TraTexB.xml</BlueprintID>
 						</iBlueprintLibrary-cAbsoluteBlueprintID>
 					</SecondaryNamedTextureSet>
-					<GeometryID d:type="cDeltaString">newS\sweden\RailNetwork\signs\[00]sign-xxxx-small</GeometryID>
+					<GeometryID d:type="cDeltaString"></GeometryID>
 					<CollisionGeometryID d:type="cDeltaString"></CollisionGeometryID>
 					<Pickable d:type="cDeltaString">eTrue</Pickable>
 					<CastsShadows d:type="cDeltaString">eTrue</CastsShadows>
